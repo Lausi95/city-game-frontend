@@ -5,7 +5,7 @@ export async function proxy(request: NextRequest) {
   const token = await getToken({ req: request });
 
   if (!token) {
-    const signInUrl = new URL("/api/auth/signin", request.url);
+    const signInUrl = new URL("/api/auth/signin/keycloak", request.url);
     signInUrl.searchParams.set("callbackUrl", request.url);
     return NextResponse.redirect(signInUrl);
   }
