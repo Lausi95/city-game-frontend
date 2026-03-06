@@ -1,33 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 
-export async function GET(request: NextRequest) {
-  const token = await getToken({ req: request });
-
-  const keycloakIssuer = process.env.KEYCLOAK_ISSUER;
+export const GET = auth(async function GET(req) {
+  const keycloakIssuer = process.env.AUTH_KEYCLOAK_ISSUER;
   const endSessionUrl = `${keycloakIssuer}/protocol/openid-connect/logout`;
-  const postLogoutRedirectUri = process.env.NEXTAUTH_URL ?? request.nextUrl.origin;
+  const postLogoutRedirectUri =
+    process.env.AUTH_URL ?? req.nextUrl.origin;
 
   const params = new URLSearchParams({
     post_logout_redirect_uri: postLogoutRedirectUri,
-    client_id: process.env.KEYCLOAK_CLIENT_ID!,
+    client_id: process.env.AUTH_KEYCLOAK_ID!,
   });
 
-  if (token?.idToken) {
-    params.set("id_token_hint", token.idToken as string);
+  if (req.auth?.idToken) {
+    params.set("id_token_hint", req.auth.idToken);
   }
 
-  // Clear the NextAuth session cookie by redirecting through NextAuth signout
-  // We set the next-auth session cookie to empty to clear it, then redirect to Keycloak logout
-  const response = NextResponse.redirect(`${endSessionUrl}?${params.toString()}`);
+  const response = NextResponse.redirect(
+    `${endSessionUrl}?${params.toString()}`
+  );
 
-  // Clear all NextAuth-related cookies
-  const cookieNames = request.cookies.getAll().map((c) => c.name);
+  // Clear all Auth.js-related cookies (v5 uses "authjs" prefix)
+  const cookieNames = req.cookies.getAll().map((c) => c.name);
   for (const name of cookieNames) {
-    if (name.startsWith("next-auth")) {
+    if (name.startsWith("authjs")) {
       response.cookies.delete(name);
     }
   }
 
   return response;
-}
+});

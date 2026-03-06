@@ -1,7 +1,9 @@
 declare namespace NodeJS {
-    export interface ProcessEnv {
-        KEYCLOAK_CLIENT_ID: string;
-        KEYCLOAK_CLIENT_SECRET: string;
-        KEYCLOAK_ISSUER: string;
-    }
+  export interface ProcessEnv {
+    AUTH_KEYCLOAK_ID: string;
+    AUTH_KEYCLOAK_SECRET: string;
+    AUTH_KEYCLOAK_ISSUER: string;
+    AUTH_SECRET: string;
+    AUTH_URL?: string;
+  }
 }
