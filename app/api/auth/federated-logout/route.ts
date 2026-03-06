@@ -1,19 +1,21 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 
-export const GET = auth(async function GET(req) {
+export async function GET(request: NextRequest) {
+  const session = await auth();
+
   const keycloakIssuer = process.env.AUTH_KEYCLOAK_ISSUER;
   const endSessionUrl = `${keycloakIssuer}/protocol/openid-connect/logout`;
   const postLogoutRedirectUri =
-    process.env.AUTH_URL ?? req.nextUrl.origin;
+    process.env.AUTH_URL ?? request.nextUrl.origin;
 
   const params = new URLSearchParams({
     post_logout_redirect_uri: postLogoutRedirectUri,
     client_id: process.env.AUTH_KEYCLOAK_ID!,
   });
 
-  if (req.auth?.idToken) {
-    params.set("id_token_hint", req.auth.idToken);
+  if (session?.idToken) {
+    params.set("id_token_hint", session.idToken);
   }
 
   const response = NextResponse.redirect(
@@ -21,7 +23,7 @@ export const GET = auth(async function GET(req) {
   );
 
   // Clear all Auth.js-related cookies (v5 uses "authjs" prefix)
-  const cookieNames = req.cookies.getAll().map((c) => c.name);
+  const cookieNames = request.cookies.getAll().map((c) => c.name);
   for (const name of cookieNames) {
     if (name.startsWith("authjs")) {
       response.cookies.delete(name);
@@ -29,4 +31,4 @@ export const GET = auth(async function GET(req) {
   }
 
   return response;
-});
+}
