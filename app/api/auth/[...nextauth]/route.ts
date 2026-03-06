@@ -12,6 +12,14 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: "/auth/signin",
   },
+  callbacks: {
+    jwt({ token, account }) {
+      if (account) {
+        token.idToken = account.id_token;
+      }
+      return token;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);
