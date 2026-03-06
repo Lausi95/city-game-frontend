@@ -5,7 +5,7 @@ export async function proxy(request: NextRequest) {
   const token = await getToken({ req: request });
 
   if (!token) {
-    const signInUrl = new URL("/api/auth/signin/keycloak", request.url);
+    const signInUrl = new URL("/auth/signin", request.url);
     signInUrl.searchParams.set("callbackUrl", request.url);
     return NextResponse.redirect(signInUrl);
   }
@@ -17,11 +17,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except:
+     * - auth/signin (custom sign-in page to avoid redirect loop)
      * - api/auth (NextAuth routes needed for the login flow itself)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!auth/signin|api/auth|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };

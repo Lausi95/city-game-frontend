@@ -9,6 +9,9 @@ export const authOptions: AuthOptions = {
       issuer: process.env.KEYCLOAK_ISSUER,
     }),
   ],
+  pages: {
+    signIn: "/auth/signin",
+  },
 };
 
 const handler = NextAuth(authOptions);
