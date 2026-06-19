@@ -7,15 +7,17 @@ export function proxy(_req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - auth/signin (custom sign-in page to avoid redirect loop)
-     * - api/auth (NextAuth routes needed for the login flow itself)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     */
-    "/((?!auth/signin|api/auth|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
-  ],
+  /*
+   * Protected set only — the operator surface. The root participant page (`/`)
+   * and participant API routes (`/api/participant/*`) are deliberately PUBLIC:
+   * participants have no Keycloak login, they are identified by IDs carried in
+   * X-GameId/X-AgentId/X-TeamId/X-MemberId headers from a setup QR scan.
+   * See docs/adr/0004-root-is-public-participant-surface.md.
+   *
+   * Authentication is the whole of authorization here: any authenticated
+   * operator is allowed (no separate admin role). The middleware body is a
+   * no-op for local dev; this matcher encodes the intended policy for when
+   * auth is re-enabled.
+   */
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };

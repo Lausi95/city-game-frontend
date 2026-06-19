@@ -8,7 +8,7 @@ export default async function Header() {
     <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-zinc-200 bg-white px-6 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex items-center gap-6">
         <Link
-          href="/"
+          href="/admin"
           className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
         >
           City Game Admin

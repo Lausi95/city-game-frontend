@@ -40,7 +40,7 @@ The NextAuth config lives in `auth.ts` at the project root.
 
 - `app/layout.tsx` — root layout; wraps everything in `<Providers>` (SessionProvider) and renders `<Header>`
 - `app/providers.tsx` — client-side `SessionProvider` wrapper
-- `app/page.tsx` — home page; requires an authenticated session, renders `<CreateGameDialog>`
+- `app/page.tsx` — root **participant** page (public); a client organism reads the `role` from local storage and renders the agent or team-member view (or a "no role set" state). See ADR 0004. Operators use `/admin`, not `/`.
 - `app/api/auth/[...nextauth]/route.ts` — NextAuth catch-all handler
 - `app/api/auth/federated-logout/route.ts` — custom Keycloak federated logout
 
@@ -52,9 +52,9 @@ Map components use `react-leaflet` and must be loaded client-side only. Use `nex
 
 ### Admin routes
 
-All administration operations — game management, team creation, and agent administration — live under `/admin`. This path requires Keycloak authorization beyond basic authentication: the user's Keycloak token must carry the appropriate admin role.
+All administration operations — game management, team creation, and agent administration — live under `/admin`. This path requires Keycloak **authentication**, and that is the whole of the authorization: any authenticated operator is allowed. There is no further admin role to check (see ADR 0004).
 
-Enforce this at the route level by reading the session in the page/layout (`auth()` from `auth.ts`) and checking for the required role on `session.idToken` (decoded) or by forwarding the token to the backend and letting it reject unauthorized requests. Do **not** rely solely on the global `proxy.ts` middleware for admin access control, since that only checks whether the user is authenticated, not whether they hold the admin role.
+The root page (`/`) and participant API routes, by contrast, are **public** — participants have no Keycloak login (they are identified by IDs carried in `X-GameId`/`X-AgentId`/`X-TeamId`/`X-MemberId` headers from a setup QR scan). The public/protected split is encoded in `proxy.ts`: `/admin` + `/api/admin/*` require authentication, `/` + `/api/participant/*` do not. `proxy.ts` is currently a no-op for local dev, but the matcher reflects the intended policy for when auth is re-enabled.
 
 Place admin page components under `app/admin/` and any admin-only API routes under `app/api/admin/`.
 

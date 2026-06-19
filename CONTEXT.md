@@ -1,6 +1,6 @@
 # City Game Admin
 
-The admin surface for a Scotland-Yard-style city game: an operator sets up a game (a map, a time window), enrolls the teams that hunt, and registers the agents they hunt for.
+A Scotland-Yard-style city game. Two surfaces share one app: the **operator** surface under `/admin` (set up a game — a map, a time window — enroll the teams that hunt, register the agents they hunt for) and the **participant** surface at `/` (the agents and team members who play from the field).
 
 ## Language
 
@@ -15,7 +15,7 @@ A group of players that hunts agents. Has a name and a member count, and accumul
 
 **Agent**:
 A person registered into a game to be hunted. Identified by an in-game `alias`, with a real `firstName`/`lastName` and `phoneNumber` for contact. Every agent has a `type` and an `active` flag.
-_Avoid_: Player (players are on teams), Target (only Mister X is the target).
+_Avoid_: Player (the individual on a team is a [Member](#participants--roles)), Target (only Mister X is the target).
 
 **Mister X** (`type: MISTERX`):
 The agent the teams are ultimately hunting — the hunted identity, not just an attribute. An agent's `type` is fixed once the game reaches the _active_ phase: it may only be changed before kickoff.
@@ -39,3 +39,28 @@ How recently an agent's device reported its position — the timestamp of its mo
 
 Derived on the client against the browser clock and never stored; like [Phase](#language), it is a function of the current time, not a field.
 _Avoid_: "online/offline" (the device may simply have lost GPS, not gone offline), "last contact".
+
+## Participants & roles
+
+**Participant**:
+A person playing a running game from the field — either an [Agent](#language) or a [Member](#participants--roles), as opposed to an [Operator](#participants--roles). The participant surface is the root page (`/`); operators use `/admin`. The backend has no participant login: a participant is identified only by the IDs they carry (`X-GameId` plus `X-AgentId` or `X-TeamId`/`X-MemberId`). An agent's IDs are carried whole by its setup QR; a team [Member](#participants--roles)'s `X-MemberId` is not — the team [Setup link](#participants--roles) carries only `gameId`+`teamId`, and the `memberId` is minted in-app at [Registration](#participants--roles).
+_Avoid_: User (every signed-in operator is also a "user"), Player.
+
+**Operator**:
+The person who sets up and administers games via `/admin`. Authenticated through Keycloak; any authenticated operator is authorized — there is no further admin role.
+_Avoid_: Admin (the *area* is `/admin`; the *person* is an operator).
+
+**Member** (Team Member):
+An individual player belonging to a [Team](#language) — the unit the backend identifies with `X-MemberId`. `team.memberCount` counts them and `GET /games/{gameId}/teams/{teamId}/members` lists them; a person becomes a Member through [Registration](#participants--roles). A Team hunts; a Member is one of the people doing the hunting.
+_Avoid_: Player.
+
+**Setup link**:
+The URL encoded in a setup QR that turns a device into a [Participant](#participants--roles). For a team the link is `/setup-team?gameId=&teamId=` — it identifies the [Team](#language) to join but carries no `memberId`; that is minted at [Registration](#participants--roles). (The agent setup link is not yet built.)
+_Avoid_: Invite link, join URL.
+
+**Registration** (team-member registration):
+The act of a device joining a [Team](#language) as a [Member](#participants--roles): opening the [Setup link](#participants--roles), confirming the team (fetched via `GET /my-team`), and tapping "Join team", which calls `POST /team-register` to mint the `memberId`. The resulting identity (carrying the [Role](#participants--roles) `team`) is stored client-side and the device is redirected to the participant surface (`/`). Distinct from an [Operator](#participants--roles) enrolling a team in `/admin`.
+_Avoid_: Sign-up, enrolment (enrolment is the operator-side act of creating the Team/Agent).
+
+**Role** (participant role):
+Which kind of participant the current device belongs to — `agent` or `team` (a [Member](#participants--roles)). It is the field the root page reads to choose between the agent view and the team-member view. Set client-side during QR-scan setup, never from a server session; the value `team` denotes a Team Member, not the Team itself.
