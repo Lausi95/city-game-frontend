@@ -1,4 +1,4 @@
-import CreateGameDialog from "./components/CreateGameDialog";
+import CreateGameDialog from "./components/organisms/CreateGameDialog";
 
 export default async function Home() {
   return (

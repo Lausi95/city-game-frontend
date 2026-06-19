@@ -1,15 +1,10 @@
-import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export const proxy = auth((req) => {
-  if (!req.auth) {
-    const signInUrl = new URL("/auth/signin", req.url);
-    signInUrl.searchParams.set("callbackUrl", req.url);
-    return NextResponse.redirect(signInUrl);
-  }
-
+// Auth disabled for local development
+export function proxy(_req: NextRequest) {
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [
