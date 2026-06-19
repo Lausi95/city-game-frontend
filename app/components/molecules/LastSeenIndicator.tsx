@@ -26,7 +26,7 @@ function bucketFor(ageMs: number): Bucket {
   return 'stale';
 }
 
-function formatAge(ageMs: number): string {
+export function formatAge(ageMs: number): string {
   const seconds = Math.max(0, Math.round(ageMs / 1000));
   if (seconds < 60) return `${seconds}s ago`;
   const minutes = Math.floor(seconds / 60);

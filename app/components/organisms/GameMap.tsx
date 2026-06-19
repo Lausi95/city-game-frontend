@@ -1,12 +1,22 @@
 'use client';
 
-import { MapContainer, TileLayer, CircleMarker, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Polyline, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { MapResource } from '@/app/types/api';
+import { formatAge } from '@/app/components/molecules/LastSeenIndicator';
+import type { AgentResource, MapResource } from '@/app/types/api';
 
 interface GameMapProps {
   map: MapResource;
+  agents: AgentResource[];
+  /** Shared, ticking wall-clock (ms). 0 means "not yet mounted". */
+  now: number;
 }
+
+// Agent marker fill by type — matches the Badge colors in AgentsSection.
+const AGENT_FILL: Record<AgentResource['type'], string> = {
+  MISTERX: '#dc2626', // red
+  UTILITY: '#2563eb', // blue
+};
 
 function GridOverlay({ map }: { map: MapResource }) {
   const { cornerA, cornerB, grid } = map;
@@ -58,7 +68,41 @@ function GridOverlay({ map }: { map: MapResource }) {
   );
 }
 
-export default function GameMap({ map }: GameMapProps) {
+/**
+ * Plots every active agent that has reported a location. The marker color
+ * encodes the agent's type (matching the list Badge); hovering reveals the
+ * alias plus how recently the position was reported. Agents without a location
+ * cannot be placed and are omitted. See docs/adr/0006.
+ */
+function AgentMarkers({ agents, now }: { agents: AgentResource[]; now: number }) {
+  const located = agents.filter((a) => a.active && a.location !== null);
+
+  return (
+    <>
+      {located.map((agent) => {
+        const { latitude, longitude, timestamp } = agent.location!;
+        const age = now > 0 ? formatAge(now - Date.parse(timestamp)) : null;
+        const fill = AGENT_FILL[agent.type];
+
+        return (
+          <CircleMarker
+            key={agent.id}
+            center={[latitude, longitude]}
+            radius={7}
+            pathOptions={{ color: '#ffffff', weight: 2, fillColor: fill, fillOpacity: 1 }}
+          >
+            <Tooltip direction="top" offset={[0, -6]}>
+              <span className="font-medium">{agent.alias}</span>
+              {age && <span className="ml-1 text-zinc-500">· {age}</span>}
+            </Tooltip>
+          </CircleMarker>
+        );
+      })}
+    </>
+  );
+}
+
+export default function GameMap({ map, agents, now }: GameMapProps) {
   const minLat = Math.min(map.cornerA.latitude, map.cornerB.latitude);
   const maxLat = Math.max(map.cornerA.latitude, map.cornerB.latitude);
   const minLng = Math.min(map.cornerA.longitude, map.cornerB.longitude);
@@ -79,17 +123,19 @@ export default function GameMap({ map }: GameMapProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; OpenStreetMap contributors"
       />
+      {/* Corner markers use neutral slate so red is reserved for Mister X agents. */}
       <CircleMarker
         center={[map.cornerA.latitude, map.cornerA.longitude]}
         radius={8}
-        pathOptions={{ color: '#dc2626', fillColor: '#dc2626', fillOpacity: 1 }}
+        pathOptions={{ color: '#334155', fillColor: '#334155', fillOpacity: 1 }}
       />
       <CircleMarker
         center={[map.cornerB.latitude, map.cornerB.longitude]}
         radius={8}
-        pathOptions={{ color: '#16a34a', fillColor: '#16a34a', fillOpacity: 1 }}
+        pathOptions={{ color: '#94a3b8', fillColor: '#94a3b8', fillOpacity: 1 }}
       />
       <GridOverlay map={map} />
+      <AgentMarkers agents={agents} now={now} />
     </MapContainer>
   );
 }

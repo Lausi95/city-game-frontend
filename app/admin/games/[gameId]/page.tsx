@@ -4,6 +4,7 @@ import { Badge } from '@/app/components/atoms/Badge';
 import TeamsSection from './_components/TeamsSection';
 import AgentsSection from './_components/AgentsSection';
 import GameMapClient from './_components/GameMapClient';
+import { AgentsProvider } from './_components/AgentsProvider';
 
 export default async function GameDetailPage({
   params,
@@ -48,20 +49,22 @@ export default async function GameDetailPage({
         </div>
       </div>
 
-      <section className="mb-8">
-        <div className="mb-2 flex items-baseline gap-3">
-          <h2 className="text-lg font-medium">Map</h2>
-          <span className="text-xs text-zinc-500">
-            {map.grid.rows} rows × {map.grid.columns} columns
-          </span>
-        </div>
-        <GameMapClient map={map} />
-      </section>
+      <AgentsProvider gameId={gameId} initial={agents.content}>
+        <section className="mb-8">
+          <div className="mb-2 flex items-baseline gap-3">
+            <h2 className="text-lg font-medium">Map</h2>
+            <span className="text-xs text-zinc-500">
+              {map.grid.rows} rows × {map.grid.columns} columns
+            </span>
+          </div>
+          <GameMapClient map={map} />
+        </section>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <TeamsSection gameId={gameId} teams={teams.content} />
-        <AgentsSection gameId={gameId} agents={agents.content} canEditType={canEditType} />
-      </div>
+        <div className="grid gap-8 lg:grid-cols-2">
+          <TeamsSection gameId={gameId} teams={teams.content} />
+          <AgentsSection gameId={gameId} canEditType={canEditType} />
+        </div>
+      </AgentsProvider>
     </div>
   );
 }

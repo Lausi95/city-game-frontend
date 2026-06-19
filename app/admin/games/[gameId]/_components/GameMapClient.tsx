@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useAgents } from './AgentsProvider';
 import type { MapResource } from '@/app/types/api';
 
 const GameMap = dynamic(() => import('@/app/components/organisms/GameMap'), {
@@ -13,5 +14,6 @@ const GameMap = dynamic(() => import('@/app/components/organisms/GameMap'), {
 });
 
 export default function GameMapClient({ map }: { map: MapResource }) {
-  return <GameMap map={map} />;
+  const { agents, now } = useAgents();
+  return <GameMap map={map} agents={agents} now={now} />;
 }
