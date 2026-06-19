@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { Select } from '@/app/components/atoms/Select';
 import { FormField } from '@/app/components/molecules/FormField';
 import { Badge } from '@/app/components/atoms/Badge';
+import { LastSeenIndicator } from '@/app/components/molecules/LastSeenIndicator';
 import EditAgentDialog from '@/app/components/organisms/EditAgentDialog';
-import type { AgentResource } from '@/app/types/api';
+import type { AgentResource, AgentCollection } from '@/app/types/api';
 
 interface AgentsSectionProps {
   gameId: string;
@@ -40,7 +41,11 @@ const defaultForm = {
   active: true,
 };
 
-export default function AgentsSection({ gameId, agents, canEditType }: AgentsSectionProps) {
+export default function AgentsSection({
+  gameId,
+  agents: serverAgents,
+  canEditType,
+}: AgentsSectionProps) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(defaultForm);
@@ -48,6 +53,37 @@ export default function AgentsSection({ gameId, agents, canEditType }: AgentsSec
   const [error, setError] = useState<string | null>(null);
 
   const [agentToEdit, setAgentToEdit] = useState<AgentResource | null>(null);
+
+  // Local copy so the location poll can update rows without a full page refresh.
+  // Reseeded from props whenever a mutation triggers router.refresh().
+  const [agents, setAgents] = useState(serverAgents);
+  useEffect(() => {
+    setAgents(serverAgents);
+  }, [serverAgents]);
+
+  // Ticking wall-clock that recolors the "last seen" dots between polls.
+  // Starts at 0 (matches SSR) and is set client-side to avoid hydration mismatch.
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Poll fresh location data every 20s. See docs/adr/0003-client-polled-location-freshness.md.
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/admin/games/${gameId}/agents`);
+        if (!res.ok) return;
+        const data: AgentCollection = await res.json();
+        setAgents(data.content);
+      } catch {
+        // Transient network error — the next tick retries.
+      }
+    }, 20_000);
+    return () => clearInterval(id);
+  }, [gameId]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,6 +220,7 @@ export default function AgentsSection({ gameId, agents, canEditType }: AgentsSec
                   <p className="text-sm font-medium">{agent.alias}</p>
                   <Badge color={agent.type === 'MISTERX' ? 'red' : 'blue'}>{agent.type}</Badge>
                   {!agent.active && <Badge color="zinc">Inactive</Badge>}
+                  <LastSeenIndicator location={agent.location} now={now} />
                 </div>
                 <p className="text-xs text-zinc-500">
                   {agent.firstName} {agent.lastName} · {agent.phoneNumber}

@@ -29,3 +29,13 @@ An administrative flag on an agent indicating whether it is in play. A plain tog
 
 **Found**:
 The relation between a team and an agent it has located (`agent.foundByTeams` / `team.foundAgents`). Established during play; the admin surface does not edit it directly.
+
+**Last seen**:
+How recently an agent's device reported its position — the timestamp of its most recent location fix (`agent.location.timestamp`), read against _now_. An agent with no `location` has never reported and has no last-seen time. Surfaced in the admin as a colored dot plus a relative age ("3m ago"). Freshness is bucketed by age:
+- **fresh** (green) — ≤ 1 minute old
+- **recent** (yellow) — ≤ 5 minutes old
+- **stale** (red) — older than 5 minutes
+- **no location** (gray) — never reported (`location` is `null`)
+
+Derived on the client against the browser clock and never stored; like [Phase](#language), it is a function of the current time, not a field.
+_Avoid_: "online/offline" (the device may simply have lost GPS, not gone offline), "last contact".
