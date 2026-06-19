@@ -5,11 +5,26 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
+import EditTeamDialog from '@/app/components/organisms/EditTeamDialog';
 import type { TeamResource } from '@/app/types/api';
 
 interface TeamsSectionProps {
   gameId: string;
   teams: TeamResource[];
+}
+
+function PencilIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      className="h-3.5 w-3.5"
+      aria-hidden="true"
+    >
+      <path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L3.5 10.025a2.25 2.25 0 0 0-.586 1.03l-.66 2.642a.75.75 0 0 0 .91.91l2.642-.66a2.25 2.25 0 0 0 1.03-.586l7.512-7.513a1.75 1.75 0 0 0 0-2.475l-.86-.86ZM4.561 11.086l6.453-6.453.86.86-6.453 6.453a.75.75 0 0 1-.343.195l-1.5.375.375-1.5a.75.75 0 0 1 .195-.343Z" />
+    </svg>
+  );
 }
 
 function TrashIcon() {
@@ -36,6 +51,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [teamToEdit, setTeamToEdit] = useState<TeamResource | null>(null);
   const [teamToDelete, setTeamToDelete] = useState<TeamResource | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -121,6 +137,15 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                 </p>
               </div>
               <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setTeamToEdit(team)}
+                  aria-label={`Edit team ${team.name}`}
+                  className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                >
+                  <PencilIcon />
+                </Button>
                 <a
                   href={`/api/admin/games/${gameId}/teams/${team.id}/setup-qr`}
                   target="_blank"
@@ -146,6 +171,14 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
             </div>
           ))}
         </div>
+      )}
+
+      {teamToEdit && (
+        <EditTeamDialog
+          gameId={gameId}
+          team={teamToEdit}
+          onClose={() => setTeamToEdit(null)}
+        />
       )}
 
       {teamToDelete && (

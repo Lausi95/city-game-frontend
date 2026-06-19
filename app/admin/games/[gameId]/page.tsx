@@ -19,6 +19,9 @@ export default async function GameDetailPage({
     fetchAgents(gameId),
   ]);
 
+  // Agent type may only be changed before the game kicks off.
+  const canEditType = new Date(game.startTime) > new Date();
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
       <Link href="/admin" className="mb-1 inline-block text-sm text-zinc-500 hover:text-zinc-700">
@@ -57,7 +60,7 @@ export default async function GameDetailPage({
 
       <div className="grid gap-8 lg:grid-cols-2">
         <TeamsSection gameId={gameId} teams={teams.content} />
-        <AgentsSection gameId={gameId} agents={agents.content} />
+        <AgentsSection gameId={gameId} agents={agents.content} canEditType={canEditType} />
       </div>
     </div>
   );

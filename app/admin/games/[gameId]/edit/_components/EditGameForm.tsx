@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { FormField } from '@/app/components/molecules/FormField';
+import { buildPatch } from '@/app/lib/patch';
 import type { Corner } from '@/app/components/organisms/MapSelector';
 
 const MapSelector = dynamic(() => import('@/app/components/organisms/MapSelector'), {
@@ -84,12 +85,17 @@ export default function EditGameForm({
       rows !== initialRows ||
       columns !== initialColumns;
 
-    const body = {
-      ...(title !== initialTitle && { title }),
-      ...(startTimeChanged && { startTime: new Date(startTime).toISOString() }),
-      ...(endTimeChanged && { endTime: new Date(endTime).toISOString() }),
-      ...(mapChanged && {
-        map: {
+    const body = buildPatch([
+      { key: 'title', value: title, changed: title !== initialTitle },
+      {
+        key: 'startTime',
+        value: new Date(startTime).toISOString(),
+        changed: startTimeChanged,
+      },
+      { key: 'endTime', value: new Date(endTime).toISOString(), changed: endTimeChanged },
+      {
+        key: 'map',
+        value: {
           cornerA: {
             latitude: Math.min(cornerA.lat, cornerB.lat),
             longitude: Math.min(cornerA.lng, cornerB.lng),
@@ -100,8 +106,9 @@ export default function EditGameForm({
           },
           grid: { rows, columns },
         },
-      }),
-    };
+        changed: mapChanged,
+      },
+    ]);
 
     try {
       const res = await fetch(`/api/admin/games/${gameId}`, {

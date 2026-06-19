@@ -60,6 +60,10 @@ export interface CreateTeamRequest {
   name: string;
 }
 
+export interface UpdateTeamRequest {
+  name?: string;
+}
+
 export interface TeamResource {
   id: string;
   name: string;

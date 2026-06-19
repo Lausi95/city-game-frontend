@@ -7,11 +7,28 @@ import { Input } from '@/app/components/atoms/Input';
 import { Select } from '@/app/components/atoms/Select';
 import { FormField } from '@/app/components/molecules/FormField';
 import { Badge } from '@/app/components/atoms/Badge';
+import EditAgentDialog from '@/app/components/organisms/EditAgentDialog';
 import type { AgentResource } from '@/app/types/api';
 
 interface AgentsSectionProps {
   gameId: string;
   agents: AgentResource[];
+  /** Whether agent types may still be changed (only before kickoff). */
+  canEditType: boolean;
+}
+
+function PencilIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      className="h-3.5 w-3.5"
+      aria-hidden="true"
+    >
+      <path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L3.5 10.025a2.25 2.25 0 0 0-.586 1.03l-.66 2.642a.75.75 0 0 0 .91.91l2.642-.66a2.25 2.25 0 0 0 1.03-.586l7.512-7.513a1.75 1.75 0 0 0 0-2.475l-.86-.86ZM4.561 11.086l6.453-6.453.86.86-6.453 6.453a.75.75 0 0 1-.343.195l-1.5.375.375-1.5a.75.75 0 0 1 .195-.343Z" />
+    </svg>
+  );
 }
 
 const defaultForm = {
@@ -23,12 +40,14 @@ const defaultForm = {
   active: true,
 };
 
-export default function AgentsSection({ gameId, agents }: AgentsSectionProps) {
+export default function AgentsSection({ gameId, agents, canEditType }: AgentsSectionProps) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(defaultForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [agentToEdit, setAgentToEdit] = useState<AgentResource | null>(null);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,18 +189,38 @@ export default function AgentsSection({ gameId, agents }: AgentsSectionProps) {
                   {agent.firstName} {agent.lastName} · {agent.phoneNumber}
                 </p>
               </div>
-              <a
-                href={`/api/admin/games/${gameId}/agents/${agent.id}/setup-qr`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="ghost" size="sm">
-                  QR
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setAgentToEdit(agent)}
+                  aria-label={`Edit agent ${agent.alias}`}
+                  className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                >
+                  <PencilIcon />
                 </Button>
-              </a>
+                <a
+                  href={`/api/admin/games/${gameId}/agents/${agent.id}/setup-qr`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="ghost" size="sm">
+                    QR
+                  </Button>
+                </a>
+              </div>
             </div>
           ))}
         </div>
+      )}
+
+      {agentToEdit && (
+        <EditAgentDialog
+          gameId={gameId}
+          agent={agentToEdit}
+          canEditType={canEditType}
+          onClose={() => setAgentToEdit(null)}
+        />
       )}
     </div>
   );
