@@ -55,12 +55,16 @@ An individual player belonging to a [Team](#language) — the unit the backend i
 _Avoid_: Player.
 
 **Setup link**:
-The URL encoded in a setup QR that turns a device into a [Participant](#participants--roles). For a team the link is `/setup-team?gameId=&teamId=` — it identifies the [Team](#language) to join but carries no `memberId`; that is minted at [Registration](#participants--roles). (The agent setup link is not yet built.)
+The URL encoded in a setup QR that turns a device into a [Participant](#participants--roles). For a team the link is `/setup-team?gameId=&teamId=` — it identifies the [Team](#language) to join but carries no `memberId`; that is minted at [Registration](#participants--roles). For an agent the link is `/setup-agent?gameId=&agentId=` — it carries the agent's whole identity, so there is nothing to mint: setup is a pure [Confirmation](#participants--roles), not a [Registration](#participants--roles). (The link may also carry a `type` param; it is ignored — the [type](#language) is read from `GET /my-agent` instead, and is being removed backend-side.)
 _Avoid_: Invite link, join URL.
 
 **Registration** (team-member registration):
 The act of a device joining a [Team](#language) as a [Member](#participants--roles): opening the [Setup link](#participants--roles), confirming the team (fetched via `GET /my-team`), and tapping "Join team", which calls `POST /team-register` to mint the `memberId`. The resulting identity (carrying the [Role](#participants--roles) `team`) is stored client-side and the device is redirected to the participant surface (`/`). Distinct from an [Operator](#participants--roles) enrolling a team in `/admin`.
 _Avoid_: Sign-up, enrolment (enrolment is the operator-side act of creating the Team/Agent).
+
+**Confirmation** (agent setup):
+The act of a device claiming an existing [Agent](#language) as its identity: opening the agent [Setup link](#participants--roles), fetching the agent via `GET /my-agent` to show who it is (alias / name / [type](#language)), and tapping "This is me". Because the [Setup link](#participants--roles) already carries the `agentId`, nothing is minted — the device simply stores the identity (carrying the [Role](#participants--roles) `agent`) client-side and is redirected to the participant surface (`/`). The agent's [Active](#language) flag is not gated here; any "in play" check belongs to the live agent view, re-read against current state. The agent counterpart to team-member [Registration](#participants--roles), minus the minting step.
+_Avoid_: Registration (no `memberId`-style mint happens), Login.
 
 **Role** (participant role):
 Which kind of participant the current device belongs to — `agent` or `team` (a [Member](#participants--roles)). It is the field the root page reads to choose between the agent view and the team-member view. Set client-side during QR-scan setup, never from a server session; the value `team` denotes a Team Member, not the Team itself.
