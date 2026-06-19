@@ -6,6 +6,7 @@ import {
   type ParticipantIdentity,
 } from '@/app/lib/identity';
 import ParticipantStub from '@/app/components/molecules/ParticipantStub';
+import AgentView from '@/app/components/organisms/AgentView';
 
 // localStorage doesn't change underneath us during a page view, so there's
 // nothing to subscribe to — the no-op subscribe keeps useSyncExternalStore happy.
@@ -41,17 +42,7 @@ export default function ParticipantRoot() {
   }
 
   if (identity?.role === 'agent') {
-    return (
-      <ParticipantStub
-        title="Agent"
-        subtitle="You are in play. Stay on the move."
-        fields={[
-          { label: 'Game', value: identity.gameId },
-          { label: 'Agent', value: identity.agentId },
-        ]}
-        comingSoon="Location reporting is coming soon."
-      />
-    );
+    return <AgentView gameId={identity.gameId} agentId={identity.agentId} />;
   }
 
   if (identity?.role === 'team') {

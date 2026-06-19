@@ -40,6 +40,14 @@ How recently an agent's device reported its position — the timestamp of its mo
 Derived on the client against the browser clock and never stored; like [Phase](#language), it is a function of the current time, not a field.
 _Avoid_: "online/offline" (the device may simply have lost GPS, not gone offline), "last contact".
 
+**Location reporting**:
+The write side of [Last seen](#language): an [Agent](#participants--roles)'s own device pushing its position to the backend (`POST /location`) while the agent view is open. The device watches the browser geolocation and also re-sends its latest fix on a fixed heartbeat, so a stationary agent stays _fresh_. It is **foreground-only** — the web page cannot report a position once it is closed or backgrounded. Reporting is not gated by [Phase](#language): the agent surface has no game time window, so it reports whenever the view is open.
+_Avoid_: Tracking, ping, check-in.
+
+**Agent self-view**:
+The [Agent](#participants--roles)'s own view of itself on the participant surface (`/`): its identity (alias, name, [type](#language), [active](#language) flag, contact), the teams that have [found](#language) it, and the [Last seen](#language) freshness of its _own_ location — read back from the server via `GET /my-agent`, so it doubles as a self-diagnostic ("is my position actually being reported?"). An agent sees only its own record, never the roster of other agents.
+_Avoid_: Agent dashboard, agent profile.
+
 ## Participants & roles
 
 **Participant**:
