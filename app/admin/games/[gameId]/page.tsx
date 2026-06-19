@@ -33,9 +33,15 @@ export default async function GameDetailPage({
             {new Date(game.endTime).toLocaleString()}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Badge color="blue">{game.teams} teams</Badge>
           <Badge color="zinc">{game.agents} agents</Badge>
+          <Link
+            href={`/admin/games/${gameId}/edit`}
+            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-900 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+          >
+            Edit
+          </Link>
         </div>
       </div>
 
