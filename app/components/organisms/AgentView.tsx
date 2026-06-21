@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Badge } from '@/app/components/atoms/Badge';
+import { Button } from '@/app/components/atoms/Button';
+import FindQrDialog from '@/app/components/organisms/FindQrDialog';
 import { StatTile } from '@/app/components/molecules/StatTile';
 import { LastSeenIndicator } from '@/app/components/molecules/LastSeenIndicator';
 import {
@@ -35,6 +37,7 @@ const REPORTING_BANNER: Partial<Record<ReportingStatus, string>> = {
 export default function AgentView({ gameId, agentId }: AgentViewProps) {
   const [load, setLoad] = useState<Load>('loading');
   const [agent, setAgent] = useState<AgentResource | null>(null);
+  const [showFindQr, setShowFindQr] = useState(false);
 
   // Ticking wall-clock that recolors the "last seen" dot between polls, and the
   // 20s poll that refreshes the server's view of our own location. Mirrors
@@ -104,6 +107,10 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
 
   const banner = REPORTING_BANNER[reporting];
 
+  // The find-QR is presented live by the hunted agent for a team to scan (ADR 0011).
+  // Only an *active* Mister X is findable, so only they get the affordance.
+  const canShowFindQr = agent.type === 'MISTERX' && agent.active;
+
   return (
     <div className="min-h-[calc(100vh-65px)] bg-zinc-50 font-sans dark:bg-black">
       <main className="mx-auto flex w-full max-w-md flex-col gap-5 px-5 py-8">
@@ -125,6 +132,12 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
           >
             {banner}
           </p>
+        )}
+
+        {canShowFindQr && (
+          <Button className="w-full" onClick={() => setShowFindQr(true)}>
+            Show find QR
+          </Button>
         )}
 
         <div className="grid grid-cols-2 gap-3">
@@ -168,6 +181,14 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
           </div>
         </div>
       </main>
+
+      {showFindQr && (
+        <FindQrDialog
+          gameId={gameId}
+          agentId={agentId}
+          onClose={() => setShowFindQr(false)}
+        />
+      )}
     </div>
   );
 }

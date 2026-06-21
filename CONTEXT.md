@@ -34,6 +34,10 @@ The relation between a team and an agent it has located (`agent.foundByTeams` / 
 A [Member](#participants--roles) recording that their [Team](#language) has located an [Agent](#language) — the participant write-side of [Found](#language) (`POST /find`, `X-GameId`+`X-TeamId`+`X-MemberId`+`X-AgentId`, optional body reporting the member's own position). Reached only by scanning a backend-minted find-QR that opens `/find?agentId=&alias=`; there is no in-app navigation to it. The member confirms the find against the `alias` carried in the link — the surface never reads the agent record, to avoid leaking [Mister X](#language)'s location or identity (see ADR 0010). The backend alone validates it: it rejects a find against an agent not in the team's game, against a [game](#language) that is not _active_, against an agent that is not findable, or one the team has already found.
 _Avoid_: Catch, capture, tag (the backend term is _find_); Sighting (a sighting is seeing an agent on the [Board](#language), not recording the catch).
 
+**Find QR**:
+The QR code an [Agent](#language) presents on its own device for a hunting [Team](#language) to scan — it opens `/find?agentId=&alias=` so the team can record a [Find](#language) (`GET /find-qr`, `X-GameId`+`X-AgentId`, returns a PNG). Minted live by the backend and shown in the [Agent self-view](#language), but only for an _active_ [Mister X](#language) — the sole findable identity (see ADR 0011). Distinct from the setup QR of a [Setup link](#participants--roles), which is operator-minted for onboarding; the find QR is presented in the moment of contact during play.
+_Avoid_: Catch code, find code (it is a _QR_).
+
 **Last seen**:
 How recently an agent's device reported its position — the timestamp of its most recent location fix (`agent.location.timestamp`), read against _now_. An agent with no `location` has never reported and has no last-seen time. Surfaced in the admin as a colored dot plus a relative age ("3m ago"). Freshness is bucketed by age:
 - **fresh** (green) — ≤ 1 minute old
@@ -49,7 +53,7 @@ The write side of [Last seen](#language): an [Agent](#participants--roles)'s own
 _Avoid_: Tracking, ping, check-in.
 
 **Agent self-view**:
-The [Agent](#participants--roles)'s own view of itself on the participant surface (`/`): its identity (alias, name, [type](#language), [active](#language) flag, contact), the teams that have [found](#language) it, and the [Last seen](#language) freshness of its _own_ location — read back from the server via `GET /my-agent`, so it doubles as a self-diagnostic ("is my position actually being reported?"). An agent sees only its own record, never the roster of other agents.
+The [Agent](#participants--roles)'s own view of itself on the participant surface (`/`): its identity (alias, name, [type](#language), [active](#language) flag, contact), the teams that have [found](#language) it, and the [Last seen](#language) freshness of its _own_ location — read back from the server via `GET /my-agent`, so it doubles as a self-diagnostic ("is my position actually being reported?"). An agent sees only its own record, never the roster of other agents. An _active_ [Mister X](#language) can also present its [Find QR](#language) from here (see ADR 0011).
 _Avoid_: Agent dashboard, agent profile.
 
 **Board**:
