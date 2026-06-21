@@ -10,9 +10,15 @@ const HEARTBEAT_MS = 20_000;
 /** Why the device might not be reporting — surfaced to the agent, not swallowed. */
 export type ReportingStatus = 'prompting' | 'reporting' | 'denied' | 'unavailable';
 
-interface Fix {
+export interface Fix {
   latitude: number;
   longitude: number;
+}
+
+/** The hook's output: reporting status plus the latest live fix (null until the first one). */
+export interface Reporting {
+  status: ReportingStatus;
+  fix: Fix | null;
 }
 
 /**
@@ -23,18 +29,23 @@ interface Fix {
  * (the /my-agent poll), so POST failures here are intentionally non-fatal — they
  * simply let the indicator decay, which is the whole point.
  *
- * See docs/adr/0005-agent-self-reported-location.md.
+ * Also returns the latest live fix so the view can derive Out-of-bounds from the
+ * SAME position it reports — marker, banner, and server "last seen" can never
+ * disagree. See docs/adr/0005-agent-self-reported-location.md and
+ * docs/adr/0012-agent-out-of-bounds-derived-client-side.md.
  */
 export function useAgentLocationReporting(
   gameId: string,
   agentId: string,
-): ReportingStatus {
+): Reporting {
   // Geolocation availability is known at first render (this hook is client-only),
   // so seed it lazily rather than setting state inside the effect.
   const [status, setStatus] = useState<ReportingStatus>(() =>
     typeof navigator !== 'undefined' && navigator.geolocation ? 'prompting' : 'unavailable',
   );
-  // Latest fix the heartbeat re-sends; a ref so updating it never restarts the effect.
+  // The live fix, mirrored to state so consumers (the bounds map/banner) re-render on it.
+  const [fix, setFix] = useState<Fix | null>(null);
+  // Same fix the heartbeat re-sends; a ref so updating it never restarts the effect.
   const latestFix = useRef<Fix | null>(null);
 
   useEffect(() => {
@@ -60,10 +71,11 @@ export function useAgentLocationReporting(
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         if (cancelled) return;
-        const fix = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
-        latestFix.current = fix;
+        const next = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+        latestFix.current = next;
+        setFix(next);
         setStatus('reporting');
-        post(fix); // fresh fix while moving
+        post(next); // fresh fix while moving
       },
       (err) => {
         if (cancelled) return;
@@ -85,5 +97,5 @@ export function useAgentLocationReporting(
     };
   }, [gameId, agentId]);
 
-  return status;
+  return { status, fix };
 }

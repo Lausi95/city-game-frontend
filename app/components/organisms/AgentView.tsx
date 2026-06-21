@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Badge } from '@/app/components/atoms/Badge';
 import { Button } from '@/app/components/atoms/Button';
 import FindQrDialog from '@/app/components/organisms/FindQrDialog';
@@ -10,7 +11,38 @@ import {
   useAgentLocationReporting,
   type ReportingStatus,
 } from '@/app/lib/useAgentLocationReporting';
-import type { AgentResource } from '@/app/types/api';
+import type { AgentResource, GeoLocation, MapResource } from '@/app/types/api';
+
+// Leaflet touches `window` at import time, so the bounds map is client-only.
+const AgentBoundsMap = dynamic(
+  () => import('@/app/components/organisms/AgentBoundsMap'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-sm text-zinc-400 dark:bg-zinc-900">
+        Loading map…
+      </div>
+    ),
+  },
+);
+
+/** Where the agent sits relative to the playfield. `unknown` = no fix or no map yet. */
+type Bounds = 'unknown' | 'in' | 'out';
+
+/** Inside the playfield rectangle, edges inclusive; corner order normalised. */
+function computeBounds(map: MapResource | null, fix: GeoLocation | null): Bounds {
+  if (!map || !fix) return 'unknown';
+  const minLat = Math.min(map.cornerA.latitude, map.cornerB.latitude);
+  const maxLat = Math.max(map.cornerA.latitude, map.cornerB.latitude);
+  const minLng = Math.min(map.cornerA.longitude, map.cornerB.longitude);
+  const maxLng = Math.max(map.cornerA.longitude, map.cornerB.longitude);
+  const inside =
+    fix.latitude >= minLat &&
+    fix.latitude <= maxLat &&
+    fix.longitude >= minLng &&
+    fix.longitude <= maxLng;
+  return inside ? 'in' : 'out';
+}
 
 interface AgentViewProps {
   gameId: string;
@@ -37,6 +69,7 @@ const REPORTING_BANNER: Partial<Record<ReportingStatus, string>> = {
 export default function AgentView({ gameId, agentId }: AgentViewProps) {
   const [load, setLoad] = useState<Load>('loading');
   const [agent, setAgent] = useState<AgentResource | null>(null);
+  const [map, setMap] = useState<MapResource | null>(null);
   const [showFindQr, setShowFindQr] = useState(false);
 
   // Ticking wall-clock that recolors the "last seen" dot between polls, and the
@@ -64,6 +97,25 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
     }
   }, [gameId, agentId]);
 
+  // The playfield rectangle is fixed for a game, so fetch it once. Its absence only
+  // hides the bounds map/banner — it never blocks the rest of the self-view.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/participant/map?gameId=${encodeURIComponent(gameId)}`,
+        );
+        if (res.ok && active) setMap(await res.json());
+      } catch {
+        // Non-fatal: no playfield map this load; the bounds UI simply stays hidden.
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [gameId]);
+
   // Initial load.
   useEffect(() => {
     let active = true;
@@ -84,8 +136,13 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
     return () => clearInterval(id);
   }, [fetchAgent]);
 
-  // Report our position while this view is open (foreground-only).
-  const reporting = useAgentLocationReporting(gameId, agentId);
+  // Report our position while this view is open (foreground-only). The same live
+  // fix drives the Out-of-bounds check, so marker/banner/server can't disagree.
+  const { status: reportingStatus, fix } = useAgentLocationReporting(gameId, agentId);
+  // Only trust the fix while we're actively reporting. After a sensor loss the hook
+  // keeps the last fix (for the heartbeat) but flips status to unavailable/denied —
+  // a stale fix must read as 'unknown', not keep asserting in/out (see ADR 0012).
+  const bounds = reportingStatus === 'reporting' ? computeBounds(map, fix) : 'unknown';
 
   if (load === 'loading') {
     return (
@@ -105,7 +162,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
     );
   }
 
-  const banner = REPORTING_BANNER[reporting];
+  const banner = REPORTING_BANNER[reportingStatus];
 
   // The find-QR is presented live by the hunted agent for a team to scan (ADR 0011).
   // Only an *active* Mister X is findable, so only they get the affordance.
@@ -131,6 +188,17 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
             className="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200"
           >
             {banner}
+          </p>
+        )}
+
+        {/* Out-of-bounds is only claimed when we have a real fix outside the playfield;
+            an unknown position falls back to the reporting banner above. */}
+        {bounds === 'out' && (
+          <p
+            role="alert"
+            className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
+          >
+            You&apos;re outside the playfield — head back into the play area.
           </p>
         )}
 
@@ -160,6 +228,30 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
               <LastSeenIndicator location={agent.location} now={now} />
             </StatTile>
           </div>
+          {/* Playfield bounds — shown only once the playfield rectangle has loaded.
+              'unknown' (no fix yet) reads as "Locating…", never "Out of bounds". */}
+          {map && (
+            <>
+              <div className="col-span-2">
+                <StatTile label="Playfield">
+                  {bounds === 'in' ? (
+                    <Badge color="green">Within playfield</Badge>
+                  ) : bounds === 'out' ? (
+                    <Badge color="red">Out of bounds</Badge>
+                  ) : (
+                    <span className="text-zinc-500">Locating…</span>
+                  )}
+                </StatTile>
+              </div>
+              <div className="col-span-2 h-56 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+                <AgentBoundsMap
+                  map={map}
+                  position={fix}
+                  outOfBounds={bounds === 'out'}
+                />
+              </div>
+            </>
+          )}
           {/* Variable-length list — span the full row, one row per team. */}
           <div className="col-span-2">
             <StatTile label="Found by">
