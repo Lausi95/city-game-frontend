@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -56,6 +56,38 @@ function BoundsFitter({ cornerA, cornerB }: { cornerA: Corner | null; cornerB: C
       );
     }
   }, [cornerA, cornerB, map]);
+  return null;
+}
+
+// Pans the map once to the operator's current location. Rendered only when no
+// corners are set, so it never fights BoundsFitter (edit flow / mid-selection).
+// MapContainer's `center` prop is read only at mount, so this must move the map
+// imperatively. See ADR 0007.
+function LocationCenterer() {
+  const map = useMap();
+  useEffect(() => {
+    // Cancelled once the operator interacts (drag/zoom) OR a corner is placed —
+    // the latter unmounts this component, so cleanup must also cancel a late
+    // geolocation callback that would otherwise yank the view. See ADR 0007.
+    let cancelled = false;
+    const cancel = () => {
+      cancelled = true;
+    };
+    map.on('dragstart', cancel);
+    map.on('zoomstart', cancel);
+
+    navigator.geolocation?.getCurrentPosition((pos) => {
+      if (!cancelled) {
+        map.setView([pos.coords.latitude, pos.coords.longitude], 13);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      map.off('dragstart', cancel);
+      map.off('zoomstart', cancel);
+    };
+  }, [map]);
   return null;
 }
 
@@ -125,14 +157,6 @@ export default function MapSelector({
   columns,
   onChange,
 }: MapSelectorProps) {
-  const [center, setCenter] = useState<[number, number]>([51.505, -0.09]);
-
-  useEffect(() => {
-    navigator.geolocation?.getCurrentPosition((pos) => {
-      setCenter([pos.coords.latitude, pos.coords.longitude]);
-    });
-  }, []);
-
   const step: 0 | 1 | 2 = !cornerA ? 0 : !cornerB ? 1 : 2;
 
   const handleCornerA = (p: LatLng) => onChange({ lat: p.lat, lng: p.lng }, null);
@@ -146,7 +170,7 @@ export default function MapSelector({
         {step === 2 && 'Click the map to reset and pick new corners'}
       </p>
       <MapContainer
-        center={center}
+        center={[51.505, -0.09]}
         zoom={13}
         className="h-96 w-full rounded-md border border-zinc-200"
       >
@@ -156,6 +180,7 @@ export default function MapSelector({
         />
         <ClickHandler step={step} onCornerA={handleCornerA} onCornerB={handleCornerB} />
         <BoundsFitter cornerA={cornerA} cornerB={cornerB} />
+        {!cornerA && !cornerB && <LocationCenterer />}
         {cornerA && (
           <CircleMarker
             center={[cornerA.lat, cornerA.lng]}
