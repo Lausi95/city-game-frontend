@@ -165,3 +165,30 @@ export interface BoardResource {
   utilityAgents: BoardUtilityAgent[];
   misterxAgents: BoardMisterxAgent[];
 }
+
+// --- Leaderboard: team ranking by Mister X found (GET /leaderboard) ---
+// See CONTEXT.md (Leaderboard) and docs/adr/0009-leaderboard-split-surfaces-public-data.md.
+
+/** A found Mister X inside a leaderboard entry: its alias and when the team found it. */
+export interface LeaderboardFoundAgent {
+  alias: string;
+  foundAt: string;
+}
+
+/**
+ * One team's standing. The backend guarantees `agents.length === foundCount`
+ * (the list is filtered to the same counted/active Mister X set as the count),
+ * so the headline number and the expanded list never disagree.
+ */
+export interface LeaderboardEntry {
+  teamId: string;
+  teamName: string;
+  foundCount: number;
+  agents: LeaderboardFoundAgent[];
+}
+
+/** Teams in rank order, best first; zero-find teams cluster at the end (order meaningless). */
+export interface LeaderboardResource {
+  game: GameWindow;
+  teams: LeaderboardEntry[];
+}

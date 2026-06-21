@@ -41,6 +41,12 @@ export default async function GameDetailPage({
           <Badge color="blue">{game.teams} teams</Badge>
           <Badge color="zinc">{game.agents} agents</Badge>
           <Link
+            href={`/admin/games/${gameId}/leaderboard`}
+            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-900 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+          >
+            Leaderboard
+          </Link>
+          <Link
             href={`/admin/games/${gameId}/edit`}
             className="inline-flex cursor-pointer items-center justify-center rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-900 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
           >

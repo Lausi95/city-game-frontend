@@ -28,7 +28,11 @@ A non-Mister-X agent — a detective/decoy in play alongside Mister X.
 An administrative flag on an agent indicating whether it is in play. A plain toggle with no destructive side effects; flipping it is freely reversible.
 
 **Found**:
-The relation between a team and an agent it has located (`agent.foundByTeams` / `team.foundAgents`). Established during play; the admin surface does not edit it directly.
+The relation between a team and an agent it has located (`agent.foundByTeams` / `team.foundAgents`). Established during play by a [Find](#language); the admin surface does not edit it directly.
+
+**Find** (the act):
+A [Member](#participants--roles) recording that their [Team](#language) has located an [Agent](#language) — the participant write-side of [Found](#language) (`POST /find`, `X-GameId`+`X-TeamId`+`X-MemberId`+`X-AgentId`, optional body reporting the member's own position). Reached only by scanning a backend-minted find-QR that opens `/find?agentId=&alias=`; there is no in-app navigation to it. The member confirms the find against the `alias` carried in the link — the surface never reads the agent record, to avoid leaking [Mister X](#language)'s location or identity (see ADR 0010). The backend alone validates it: it rejects a find against an agent not in the team's game, against a [game](#language) that is not _active_, against an agent that is not findable, or one the team has already found.
+_Avoid_: Catch, capture, tag (the backend term is _find_); Sighting (a sighting is seeing an agent on the [Board](#language), not recording the catch).
 
 **Last seen**:
 How recently an agent's device reported its position — the timestamp of its most recent location fix (`agent.location.timestamp`), read against _now_. An agent with no `location` has never reported and has no last-seen time. Surfaced in the admin as a colored dot plus a relative age ("3m ago"). Freshness is bucketed by age:
@@ -51,6 +55,10 @@ _Avoid_: Agent dashboard, agent profile.
 **Board**:
 The live playfield as one [Team](#language) sees it (`GET /board`, `X-GameId` + optional `X-TeamId`): the gridded [map](#language) overlaid with the agents currently visible to that team. [Utility agents](#language) appear at their exact location; [Mister X](#language) agents are **obfuscated to a [Cell](#language)** — the team learns only which cell a Mister X is in, never the precise point. Supplying `X-TeamId` hides the Mister X that team has already [found](#language), so a caught Mister X simply disappears from that team's board.
 _Avoid_: Playfield (the board is the *team's view* of the playfield, not the playfield itself), Map (the map is the board's backdrop; the board is map + agents).
+
+**Leaderboard**:
+The ranking of a [game](#language)'s [teams](#language) by how many [Mister X](#language) agents they have [found](#language) (`GET /leaderboard`, `X-GameId`). The backend returns the teams already in rank order, best first; teams with no counted finds cluster at the end with no meaningful order among them. Each entry carries the team's `foundCount` and the list of found Mister X (`alias` + `foundAt`, earliest first) — so the per-team detail is part of the ranking payload, not a separate lookup. Only **active** [Mister X](#language) finds count toward the ranking; [Utility agent](#language) finds never do, and the entry's `agents` list is filtered to the same counted set as `foundCount` (`agents.length === foundCount` always holds — the headline number and the expanded list never disagree). **Rank** is derived on the client from `foundCount`, not array position: equal counts share a rank with a gap after a tie (`1, 2, 2, 4`); teams with zero counted finds are shown unranked (a dash), since the backend gives their order no meaning. Read by both [teams](#language) (public `/leaderboard`) and [Operators](#participants--roles) (`/admin/games/{id}/leaderboard`).
+_Avoid_: Score (there are no points — only a count of found Mister X), Standings.
 
 **Cell** (grid cell):
 One square of the [map](#language)'s grid, addressed by zero-based `row`/`column` with origin `(0,0)` at the south-west corner (row increases northward, column eastward). The unit of obfuscation for [Mister X](#language) on the [Board](#language): a team sees the cell, not the coordinate.

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import type { BoardResource, TeamResource } from '@/app/types/api';
 
@@ -119,6 +120,14 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
           <span className="text-zinc-400">
             Found <span className="font-semibold text-zinc-100">{team?.foundAgents.length ?? 0}</span>
           </span>
+          <Link
+            href="/leaderboard"
+            aria-label="Leaderboard"
+            title="Leaderboard"
+            className="text-lg leading-none text-zinc-400 transition-colors hover:text-zinc-100"
+          >
+            🏆
+          </Link>
         </div>
       </header>
       <div className="min-h-0 flex-1">
