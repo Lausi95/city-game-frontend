@@ -126,3 +126,42 @@ export interface AgentCollection {
   size: number;
   empty: boolean;
 }
+
+// --- Board: the live playfield as a team sees it (GET /board) ---
+// See CONTEXT.md (Board, Cell) and docs/adr/0008-board-omits-last-seen-freshness.md.
+
+export interface GameWindow {
+  startTime: string;
+  endTime: string;
+}
+
+/** Zero-based grid cell; origin (0,0) is the south-west corner, row increasing north, column east. */
+export interface Cell {
+  row: number;
+  column: number;
+}
+
+/** A utility agent shown at its exact last-known location. */
+export interface BoardUtilityAgent {
+  id: string;
+  alias: string;
+  geoLocation: GeoLocation;
+  // lastSeenAt is returned by the backend but intentionally unused — see ADR 0008.
+  lastSeenAt: string;
+}
+
+/** A Mister X agent obfuscated to the grid cell containing its last-known location. */
+export interface BoardMisterxAgent {
+  id: string;
+  alias: string;
+  cell: Cell;
+  // lastSeenAt is returned by the backend but intentionally unused — see ADR 0008.
+  lastSeenAt: string;
+}
+
+export interface BoardResource {
+  game: GameWindow;
+  map: MapDto;
+  utilityAgents: BoardUtilityAgent[];
+  misterxAgents: BoardMisterxAgent[];
+}

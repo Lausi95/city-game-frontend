@@ -48,6 +48,13 @@ _Avoid_: Tracking, ping, check-in.
 The [Agent](#participants--roles)'s own view of itself on the participant surface (`/`): its identity (alias, name, [type](#language), [active](#language) flag, contact), the teams that have [found](#language) it, and the [Last seen](#language) freshness of its _own_ location — read back from the server via `GET /my-agent`, so it doubles as a self-diagnostic ("is my position actually being reported?"). An agent sees only its own record, never the roster of other agents.
 _Avoid_: Agent dashboard, agent profile.
 
+**Board**:
+The live playfield as one [Team](#language) sees it (`GET /board`, `X-GameId` + optional `X-TeamId`): the gridded [map](#language) overlaid with the agents currently visible to that team. [Utility agents](#language) appear at their exact location; [Mister X](#language) agents are **obfuscated to a [Cell](#language)** — the team learns only which cell a Mister X is in, never the precise point. Supplying `X-TeamId` hides the Mister X that team has already [found](#language), so a caught Mister X simply disappears from that team's board.
+_Avoid_: Playfield (the board is the *team's view* of the playfield, not the playfield itself), Map (the map is the board's backdrop; the board is map + agents).
+
+**Cell** (grid cell):
+One square of the [map](#language)'s grid, addressed by zero-based `row`/`column` with origin `(0,0)` at the south-west corner (row increases northward, column eastward). The unit of obfuscation for [Mister X](#language) on the [Board](#language): a team sees the cell, not the coordinate.
+
 ## Participants & roles
 
 **Participant**:
