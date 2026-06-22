@@ -1,2 +1,36 @@
+import { NextRequest } from "next/server";
 import { handlers } from "@/auth";
-export const { GET, POST } = handlers;
+import { externalOrigin } from "@/app/lib/origin";
+
+// NextAuth's route-handler path builds the OAuth origin from `req.url`, which in
+// the standalone container is the listen address `0.0.0.0:3000`, not the tenant
+// domain. We rebuild the request URL from the traefik-forwarded host so both the
+// authorization leg and the callback token-exchange leg agree on the external
+// origin. See docs/adr/0019-auth-derives-external-origin-from-forwarded-host.md.
+function withForwardedOrigin(
+  handler: (req: NextRequest) => Promise<Response>,
+): (req: NextRequest) => Promise<Response> {
+  return (req) => {
+    // TEMP (ADR 0019): confirm what traefik actually forwards in prod, then
+    // remove. Reachable unauthenticated via /api/auth/providers.
+    console.log("[auth] forwarded headers", {
+      url: req.url,
+      host: req.headers.get("host"),
+      "x-forwarded-host": req.headers.get("x-forwarded-host"),
+      "x-forwarded-proto": req.headers.get("x-forwarded-proto"),
+    });
+
+    const origin = externalOrigin(req.headers);
+    if (origin) {
+      const url = new URL(req.url);
+      const ext = new URL(origin);
+      url.protocol = ext.protocol;
+      url.host = ext.host;
+      req = new NextRequest(url, req);
+    }
+    return handler(req);
+  };
+}
+
+export const GET = withForwardedOrigin(handlers.GET);
+export const POST = withForwardedOrigin(handlers.POST);

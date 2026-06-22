@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { externalOrigin } from "@/app/lib/origin";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
 
   const keycloakIssuer = process.env.AUTH_KEYCLOAK_ISSUER;
   const endSessionUrl = `${keycloakIssuer}/protocol/openid-connect/logout`;
+  // Derive the external origin from the forwarded host, not req.nextUrl.origin
+  // (which is the container's 0.0.0.0:3000 listen address behind traefik).
+  // See docs/adr/0019-auth-derives-external-origin-from-forwarded-host.md.
   const postLogoutRedirectUri =
-    process.env.AUTH_URL ?? request.nextUrl.origin;
+    externalOrigin(request.headers) ?? request.nextUrl.origin;
 
   const params = new URLSearchParams({
     post_logout_redirect_uri: postLogoutRedirectUri,

@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { externalOrigin } from '@/app/lib/origin';
 
 /**
  * Tenant-resolution headers for an outbound backend call.
@@ -28,12 +29,10 @@ export async function tenantHeaders(): Promise<Record<string, string>> {
     return { 'X-TENANT-OVERRIDE': override };
   }
 
-  const h = await headers();
-  const host = h.get('x-forwarded-host') ?? h.get('host');
-  if (!host) {
+  const origin = externalOrigin(await headers());
+  if (!origin) {
     return {};
   }
 
-  const proto = h.get('x-forwarded-proto') ?? 'https';
-  return { Origin: `${proto}://${host}` };
+  return { Origin: origin };
 }

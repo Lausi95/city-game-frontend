@@ -34,7 +34,10 @@ label discovery. One container serves several tenant domains via an explicit
 
 - **traefik must forward `X-Forwarded-Host` and `X-Forwarded-Proto`.** Both the
   tenant resolution and the auth base URL depend on them. traefik sets these by
-  default; if that ever changes, tenant resolution silently breaks.
+  default; if that ever changes, tenant resolution silently breaks. How the app
+  actually honors the forwarded host for auth (NextAuth's route-handler path does
+  not, by default) is recorded in
+  [ADR 0019](./0019-auth-derives-external-origin-from-forwarded-host.md).
 
 - **Secrets arrive at runtime via `env_file`** (`.env.production` on the server,
   gitignored), never baked into the image. See `.env.production.example`.
