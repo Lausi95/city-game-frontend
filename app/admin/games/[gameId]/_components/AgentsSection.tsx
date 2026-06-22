@@ -1,18 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Pencil, QrCode } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { Select } from '@/app/components/atoms/Select';
 import { FormField } from '@/app/components/molecules/FormField';
+import { Pagination } from '@/app/components/molecules/Pagination';
 import { Badge } from '@/app/components/atoms/Badge';
 import { LastSeenIndicator } from '@/app/components/molecules/LastSeenIndicator';
 import EditAgentDialog from '@/app/components/organisms/EditAgentDialog';
 import SetupQrDialog from '@/app/components/organisms/SetupQrDialog';
 import { useAgents } from './AgentsProvider';
 import type { AgentResource } from '@/app/types/api';
+
+const PAGE_SIZE = 10;
 
 interface AgentsSectionProps {
   gameId: string;
@@ -43,6 +46,16 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
   // the map share one polled source. See docs/adr/0003 and docs/adr/0006.
   const { agents, now } = useAgents();
 
+  // Client-side pagination over the polled set (the map still gets all agents).
+  // See docs/adr/0026.
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(agents.length / PAGE_SIZE));
+  // Clamp if the set shrinks (e.g. a poll returns fewer agents than the page index).
+  useEffect(() => {
+    if (page > totalPages - 1) setPage(totalPages - 1);
+  }, [page, totalPages]);
+  const visibleAgents = agents.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -62,6 +75,8 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
 
       setForm(defaultForm);
       setShowForm(false);
+      // Land on the page the new agent will occupy so the operator sees it.
+      setPage(Math.ceil((agents.length + 1) / PAGE_SIZE) - 1);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
@@ -171,11 +186,20 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
         </form>
       )}
 
+      {agents.length > 0 && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPrev={() => setPage((p) => Math.max(0, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+        />
+      )}
+
       {agents.length === 0 ? (
         <p className="text-sm text-zinc-500">Noch keine Agenten.</p>
       ) : (
         <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
-          {agents.map((agent) => (
+          {visibleAgents.map((agent) => (
             <div key={agent.id} className="flex items-center justify-between px-3 py-2.5">
               <div>
                 <div className="flex items-center gap-2">

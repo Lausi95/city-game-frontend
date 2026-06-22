@@ -1,16 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Pencil, QrCode, Target, Trash2 } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
+import { Pagination } from '@/app/components/molecules/Pagination';
 import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
 import EditTeamDialog from '@/app/components/organisms/EditTeamDialog';
 import RecordFindDialog from '@/app/components/organisms/RecordFindDialog';
 import SetupQrDialog from '@/app/components/organisms/SetupQrDialog';
 import type { TeamResource } from '@/app/types/api';
 import { useAgents } from './AgentsProvider';
+
+const PAGE_SIZE = 10;
 
 interface TeamsSectionProps {
   gameId: string;
@@ -31,6 +34,15 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  // Client-side pagination over the server-rendered teams. See docs/adr/0026.
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(teams.length / PAGE_SIZE));
+  // Clamp when the current page empties (e.g. after deleting its last team).
+  useEffect(() => {
+    if (page > totalPages - 1) setPage(totalPages - 1);
+  }, [page, totalPages]);
+  const visibleTeams = teams.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -49,6 +61,8 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
       }
 
       setName('');
+      // Land on the page the new team will occupy so the operator sees it.
+      setPage(Math.ceil((teams.length + 1) / PAGE_SIZE) - 1);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
@@ -103,11 +117,20 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
 
       {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
 
+      {teams.length > 0 && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPrev={() => setPage((p) => Math.max(0, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+        />
+      )}
+
       {teams.length === 0 ? (
         <p className="text-sm text-zinc-500">Noch keine Teams.</p>
       ) : (
         <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
-          {teams.map((team) => (
+          {visibleTeams.map((team) => (
             <div key={team.id} className="flex items-center justify-between px-3 py-2.5">
               <div>
                 <p className="text-sm font-medium">{team.name}</p>
