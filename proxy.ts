@@ -1,10 +1,32 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { auth } from "@/auth";
 
-// Auth disabled for local development
-export function proxy(_req: NextRequest) {
-  return NextResponse.next();
-}
+// Auth enforced for the operator surface. See docs/adr/0014-operator-access-token-on-games-endpoints.md.
+//
+// Wrapped with NextAuth's `auth()` so `req.auth` carries the session. When there
+// is none, behaviour splits on the path:
+//   - /admin/*      (page nav)  → redirect to Keycloak via /auth/signin, preserving
+//                                 the requested URL as callbackUrl so login returns there.
+//   - /api/admin/*  (fetch)     → 401 JSON, never a redirect (a fetch would follow a
+//                                 302 to the HTML login and corrupt the response).
+export const proxy = auth((req) => {
+  // A failed silent refresh leaves a session with a stale token and an `error`
+  // flag — treat it as unauthenticated so the operator is forced to re-login
+  // rather than slipping through to backend 401s.
+  if (req.auth && !req.auth.error) {
+    return NextResponse.next();
+  }
+
+  const { pathname } = req.nextUrl;
+
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
+  }
+
+  const signInUrl = new URL("/auth/signin", req.nextUrl.origin);
+  signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
+  return NextResponse.redirect(signInUrl);
+});
 
 export const config = {
   /*
@@ -15,9 +37,7 @@ export const config = {
    * See docs/adr/0004-root-is-public-participant-surface.md.
    *
    * Authentication is the whole of authorization here: any authenticated
-   * operator is allowed (no separate admin role). The middleware body is a
-   * no-op for local dev; this matcher encodes the intended policy for when
-   * auth is re-enabled.
+   * operator is allowed (no separate admin role).
    */
   matcher: ["/admin/:path*", "/api/admin/:path*"],
 };

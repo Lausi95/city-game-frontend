@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { CreateAgentRequest } from '@/app/types/api';
-
-const API_URL = process.env.API_URL ?? 'http://localhost:8080';
+import { authedFetch } from '@/app/lib/authedFetch';
 
 // Client-callable read used by AgentsSection's location-freshness poll.
 // See docs/adr/0003-client-polled-location-freshness.md.
@@ -11,7 +10,7 @@ export async function GET(
 ) {
   const { gameId } = await params;
 
-  const res = await fetch(`${API_URL}/games/${gameId}/agents?page=0&size=50`, {
+  const res = await authedFetch(`/games/${gameId}/agents?page=0&size=50`, {
     cache: 'no-store',
   });
 
@@ -30,7 +29,7 @@ export async function POST(
   const { gameId } = await params;
   const body: CreateAgentRequest = await req.json();
 
-  const res = await fetch(`${API_URL}/games/${gameId}/agents`, {
+  const res = await authedFetch(`/games/${gameId}/agents`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

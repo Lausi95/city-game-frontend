@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const API_URL = process.env.API_URL ?? 'http://localhost:8080';
+import { authedFetch } from '@/app/lib/authedFetch';
 
 export async function PATCH(
   req: NextRequest,
@@ -9,7 +8,7 @@ export async function PATCH(
   const { gameId, teamId } = await params;
   const body = await req.json();
 
-  const res = await fetch(`${API_URL}/games/${gameId}/teams/${teamId}`, {
+  const res = await authedFetch(`/games/${gameId}/teams/${teamId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -30,7 +29,7 @@ export async function DELETE(
 ) {
   const { gameId, teamId } = await params;
 
-  const res = await fetch(`${API_URL}/games/${gameId}/teams/${teamId}`, {
+  const res = await authedFetch(`/games/${gameId}/teams/${teamId}`, {
     method: 'DELETE',
   });
 

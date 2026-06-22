@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const API_URL = process.env.API_URL ?? 'http://localhost:8080';
+import { authedFetch } from '@/app/lib/authedFetch';
 
 export async function GET(
   _req: NextRequest,
@@ -8,7 +7,7 @@ export async function GET(
 ) {
   const { gameId, teamId } = await params;
 
-  const res = await fetch(`${API_URL}/games/${gameId}/teams/${teamId}/setup-qr`);
+  const res = await authedFetch(`/games/${gameId}/teams/${teamId}/setup-qr`);
 
   if (!res.ok) {
     return new NextResponse(null, { status: res.status });

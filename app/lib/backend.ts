@@ -5,11 +5,13 @@ import type {
   TeamCollection,
   AgentCollection,
 } from '@/app/types/api';
+import { authedFetch } from './authedFetch';
 
-const API_URL = process.env.API_URL ?? 'http://localhost:8080';
-
+// All of these read `/games/**`, which requires the operator's access token
+// (see docs/adr/0014-operator-access-token-on-games-endpoints.md). authedFetch
+// attaches the Bearer token; these helpers run only in admin server components.
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { cache: 'no-store' });
+  const res = await authedFetch(path, { cache: 'no-store' });
   if (!res.ok) {
     throw new Error(`Backend ${res.status}: ${path}`);
   }

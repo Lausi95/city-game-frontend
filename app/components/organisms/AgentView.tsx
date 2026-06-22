@@ -11,7 +11,7 @@ import {
   useAgentLocationReporting,
   type ReportingStatus,
 } from '@/app/lib/useAgentLocationReporting';
-import type { AgentResource, GeoLocation, MapResource } from '@/app/types/api';
+import type { AgentResource, GeoLocation, MapDto } from '@/app/types/api';
 
 // Leaflet touches `window` at import time, so the bounds map is client-only.
 const AgentBoundsMap = dynamic(
@@ -30,7 +30,7 @@ const AgentBoundsMap = dynamic(
 type Bounds = 'unknown' | 'in' | 'out';
 
 /** Inside the playfield rectangle, edges inclusive; corner order normalised. */
-function computeBounds(map: MapResource | null, fix: GeoLocation | null): Bounds {
+function computeBounds(map: MapDto | null, fix: GeoLocation | null): Bounds {
   if (!map || !fix) return 'unknown';
   const minLat = Math.min(map.cornerA.latitude, map.cornerB.latitude);
   const maxLat = Math.max(map.cornerA.latitude, map.cornerB.latitude);
@@ -69,7 +69,7 @@ const REPORTING_BANNER: Partial<Record<ReportingStatus, string>> = {
 export default function AgentView({ gameId, agentId }: AgentViewProps) {
   const [load, setLoad] = useState<Load>('loading');
   const [agent, setAgent] = useState<AgentResource | null>(null);
-  const [map, setMap] = useState<MapResource | null>(null);
+  const [map, setMap] = useState<MapDto | null>(null);
   const [showFindQr, setShowFindQr] = useState(false);
 
   // Ticking wall-clock that recolors the "last seen" dot between polls, and the

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authedFetch } from '@/app/lib/authedFetch';
 
+// The members lookup goes through authedFetch (it reads `/games/**`, which now
+// requires the operator token — see ADR 0014). The `/find` write below stays
+// tokenless: it is the public participant endpoint (see ADR 0013), reused here
+// unchanged, and carries identity via X-* headers, not a Bearer token.
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
 // Operator manual find — a faithful fallback for when the field flow fails
@@ -29,8 +34,8 @@ export async function POST(
   }
 
   // Borrow a member to satisfy X-MemberId — we only need one.
-  const membersRes = await fetch(
-    `${API_URL}/games/${gameId}/teams/${teamId}/members?page=0&size=1`,
+  const membersRes = await authedFetch(
+    `/games/${gameId}/teams/${teamId}/members?page=0&size=1`,
   );
   if (!membersRes.ok) {
     const error = await membersRes.json().catch(() => ({ detail: membersRes.statusText }));

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { PatchGameRequest } from '@/app/types/api';
-
-const API_URL = process.env.API_URL ?? 'http://localhost:8080';
+import { authedFetch } from '@/app/lib/authedFetch';
 
 export async function PATCH(
   req: NextRequest,
@@ -10,7 +9,7 @@ export async function PATCH(
   const { gameId } = await params;
   const body: PatchGameRequest = await req.json();
 
-  const res = await fetch(`${API_URL}/games/${gameId}`, {
+  const res = await authedFetch(`/games/${gameId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

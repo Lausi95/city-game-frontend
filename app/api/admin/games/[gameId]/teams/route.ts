@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { CreateTeamRequest } from '@/app/types/api';
-
-const API_URL = process.env.API_URL ?? 'http://localhost:8080';
+import { authedFetch } from '@/app/lib/authedFetch';
 
 export async function POST(
   req: NextRequest,
@@ -10,7 +9,7 @@ export async function POST(
   const { gameId } = await params;
   const body: CreateTeamRequest = await req.json();
 
-  const res = await fetch(`${API_URL}/games/${gameId}/teams`, {
+  const res = await authedFetch(`/games/${gameId}/teams`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

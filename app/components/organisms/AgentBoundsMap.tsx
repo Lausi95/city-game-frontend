@@ -10,10 +10,10 @@ import {
   useMap,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { GeoLocation, MapResource } from '@/app/types/api';
+import type { GeoLocation, MapDto } from '@/app/types/api';
 
 interface AgentBoundsMapProps {
-  map: MapResource;
+  map: MapDto;
   /** The agent's own live position, or null while still locating. */
   position: GeoLocation | null;
   /** Whether `position` is outside the playfield — colours the marker and widens the fit. */
@@ -25,7 +25,7 @@ const OUT_OF_BOUNDS_RED = '#dc2626';
 const PLAYFIELD_OUTLINE = '#64748b';
 
 /** Geographic extent of the playfield, normalised so cornerA/B order doesn't matter. */
-function extentOf(map: MapResource) {
+function extentOf(map: MapDto) {
   const minLat = Math.min(map.cornerA.latitude, map.cornerB.latitude);
   const maxLat = Math.max(map.cornerA.latitude, map.cornerB.latitude);
   const minLng = Math.min(map.cornerA.longitude, map.cornerB.longitude);
