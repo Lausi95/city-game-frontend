@@ -4,6 +4,10 @@ A Scotland-Yard-style city game. Two surfaces share one app: the **operator** su
 
 ## Language
 
+**Tenant**:
+A distinct customer organization running its own isolated set of [games](#language), reached through its own frontend domain (one tenant ↔ one domain). It sits above the [Game](#language): one tenant owns many games. Every entity ID (`gameId`/`agentId`/`teamId`/`memberId`) is **globally unique** across tenants, so a bare `gameId` already resolves a game unambiguously — the tenant is therefore a **verification boundary**, not a disambiguator: it stops one tenant's frontend from loading another tenant's [game](#language). The backend resolves the tenant from the request `Origin`; the frontend does **not** relay the browser's `Origin` (absent on same-origin GETs and SSR navigations) but **derives** it from the incoming `Host`/`x-forwarded-host` and sets it server-side on every backend call. On localhost it sends `X-TENANT-OVERRIDE` instead — a dev-only header the backend ignores in production (see ADR 0017).
+_Avoid_: Customer, Organization, Client (the term is _tenant_), Realm (that is the Keycloak realm, a separate concept).
+
 **Game**:
 A single playthrough bounded by a `startTime` and an `endTime`, played over a gridded map area. There is no explicit lifecycle status — the game's phase is derived from the clock.
 

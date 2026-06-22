@@ -22,6 +22,8 @@ AUTH_KEYCLOAK_SECRET=
 AUTH_KEYCLOAK_ISSUER=    # e.g. https://auth.example.com/realms/city-game
 AUTH_URL=                # e.g. http://localhost:3000
 AUTH_SECRET=
+API_URL=                 # backend base URL; defaults to http://localhost:8080
+TENANT_OVERRIDE=         # local dev only: tenant to resolve against (see Tenant resolution)
 ```
 
 ## Architecture
@@ -78,3 +80,7 @@ Page components (`app/**/page.tsx`) consume organisms and templates — they sho
 ## Backend API
 
 The backend exposes an OpenAPI 3 spec at **`http://localhost:8080/v3/api-docs`** (requires the backend running locally). Use this as the authoritative reference for available endpoints, request/response schemas, and error codes when building or modifying frontend API calls.
+
+### Tenant resolution
+
+The backend resolves the **tenant** (the per-customer verification boundary — see CONTEXT.md → Tenant and ADR 0017) from the request `Origin`. **Every** outbound backend call must attach tenant headers via `tenantHeaders()` from `app/lib/tenant.ts`: `authedFetch` adds them automatically, so anything going through it (and `backend.ts`) is covered; any route that calls the backend with a raw `fetch` must spread `...(await tenantHeaders())` into its headers. The helper derives `Origin` from the incoming host server-side — it never relays the browser's `Origin` — and sends `X-TENANT-OVERRIDE` instead when `TENANT_OVERRIDE` is set for local dev.

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { getToken } from 'next-auth/jwt';
+import { tenantHeaders } from './tenant';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -39,6 +40,11 @@ export async function authedFetch(path: string, init: RequestInit = {}): Promise
 
   const headers = new Headers(init.headers);
   headers.set('Authorization', `Bearer ${accessToken}`);
+
+  // Tenant resolution — the backend keys on this; see ./tenant.ts and ADR 0017.
+  for (const [key, value] of Object.entries(await tenantHeaders())) {
+    headers.set(key, value);
+  }
 
   return fetch(`${API_URL}${path}`, { ...init, headers });
 }

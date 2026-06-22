@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authedFetch } from '@/app/lib/authedFetch';
+import { tenantHeaders } from '@/app/lib/tenant';
 
 // The members lookup goes through authedFetch (it reads `/games/**`, which now
 // requires the operator token — see ADR 0014). The `/find` write below stays
@@ -58,6 +59,7 @@ export async function POST(
       'X-TeamId': teamId,
       'X-MemberId': memberId,
       'X-AgentId': agentId,
+      ...(await tenantHeaders()),
     },
   });
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { tenantHeaders } from '@/app/lib/tenant';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   const res = await fetch(`${API_URL}/team-register`, {
     method: 'POST',
-    headers: { 'X-GameId': gameId, 'X-TeamId': teamId },
+    headers: { 'X-GameId': gameId, 'X-TeamId': teamId, ...(await tenantHeaders()) },
   });
 
   if (!res.ok) {

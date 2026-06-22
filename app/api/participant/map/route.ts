@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { BoardResource } from '@/app/types/api';
+import { tenantHeaders } from '@/app/lib/tenant';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
   }
 
   const res = await fetch(`${API_URL}/board`, {
-    headers: { 'X-GameId': gameId },
+    headers: { 'X-GameId': gameId, ...(await tenantHeaders()) },
     cache: 'no-store',
   });
 

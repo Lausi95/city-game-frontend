@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { tenantHeaders } from '@/app/lib/tenant';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ detail: 'gameId is required' }, { status: 400 });
   }
 
-  const headers: Record<string, string> = { 'X-GameId': gameId };
+  const headers: Record<string, string> = { 'X-GameId': gameId, ...(await tenantHeaders()) };
   if (teamId) headers['X-TeamId'] = teamId;
 
   const res = await fetch(`${API_URL}/board`, { headers, cache: 'no-store' });

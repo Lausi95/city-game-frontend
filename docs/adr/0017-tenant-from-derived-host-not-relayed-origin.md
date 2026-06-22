@@ -1,0 +1,9 @@
+# Tenant resolved from a derived host, not a relayed browser Origin
+
+The backend resolves the [tenant](../../CONTEXT.md) — the verification boundary that stops one customer's frontend from loading another's game — from the request `Origin` header. Entity IDs are globally unique, so this is a guard against cross-tenant loads, not a disambiguator. A server-side `fetch` sends no `Origin` by default, so today backend calls carry no tenant at all; this ADR records how the frontend supplies it.
+
+We **derive** the `Origin` from the incoming request's `Host` (`x-forwarded-host ?? host`) and set it server-side on every outbound backend call, via one shared helper used by both `authedFetch` (the `/games/**` operator surface) and the public `/api/participant/*` routes. We deliberately do **not** relay the browser's own `Origin` header: browsers omit `Origin` on same-origin GET/HEAD requests and SSR navigations, so relaying it would leave every read endpoint (`/board`, `/leaderboard`, `/my-agent`, …) tenant-less while only writes (`/find`, `/location`, `/team-register`) carried it — failing open on exactly the reads that can leak cross-tenant data. The incoming `Host` is present on every request, GET or POST, so the derived value covers them all.
+
+On localhost the host is `localhost:3000`, which maps to no tenant; the helper sends `X-TENANT-OVERRIDE: <configured tenant>` (from an env var) instead and omits `Origin`, switched on an environment flag. The backend ignores `X-TENANT-OVERRIDE` in production, so it is a dev-only affordance with no production effect.
+
+Because the participant routes are public and unauthenticated, the frontend **always constructs** the tenant signal itself from trusted server state and never passes through a client-supplied `Origin` or `X-TENANT-OVERRIDE` — a relayed client header would let a participant request another tenant's data.

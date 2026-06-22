@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { tenantHeaders } from '@/app/lib/tenant';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
       'Content-Type': 'application/json',
       'X-GameId': gameId,
       'X-AgentId': agentId,
+      ...(await tenantHeaders()),
     },
     body: JSON.stringify(body),
     cache: 'no-store',
