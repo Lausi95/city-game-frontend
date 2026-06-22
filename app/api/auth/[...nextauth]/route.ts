@@ -22,11 +22,11 @@ function withForwardedOrigin(
 
     const origin = externalOrigin(req.headers);
     if (origin) {
-      const url = new URL(req.url);
-      const ext = new URL(origin);
-      url.protocol = ext.protocol;
-      url.host = ext.host;
-      req = new NextRequest(url, req);
+      // Rebuild against the external origin via the base-URL constructor rather
+      // than mutating url.host — the host setter keeps the old :3000 port when
+      // the new value carries none, which would leak it into the redirect_uri.
+      const { pathname, search, hash } = new URL(req.url);
+      req = new NextRequest(new URL(pathname + search + hash, origin), req);
     }
     return handler(req);
   };
