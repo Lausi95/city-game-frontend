@@ -23,8 +23,20 @@ export const proxy = auth((req) => {
     return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
   }
 
+  // callbackUrl is RELATIVE (pathname + search), never the absolute href. An
+  // absolute callbackUrl must survive an origin-string comparison in NextAuth's
+  // redirect callback against the baseUrl it derives from the forwarded host;
+  // behind traefik that comparison is fragile (host normalization differences),
+  // and a mismatch falls back to the root. A leading-slash URL skips the
+  // comparison — the redirect callback simply prefixes the external baseUrl — so
+  // the operator returns to the page they requested. The /admin fallback in that
+  // callback (auth.ts) is the backstop if the callbackUrl is lost entirely.
+  // See docs/adr/0019-auth-derives-external-origin-from-forwarded-host.md.
   const signInUrl = new URL("/auth/signin", req.nextUrl.origin);
-  signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
+  signInUrl.searchParams.set(
+    "callbackUrl",
+    req.nextUrl.pathname + req.nextUrl.search,
+  );
   return NextResponse.redirect(signInUrl);
 });
 

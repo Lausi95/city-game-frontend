@@ -34,3 +34,33 @@ introduces no new trust. As 0018 already requires, every served tenant domain's
 callback (`https://<domain>/api/auth/callback/keycloak`) must remain a registered
 redirect URI in the Keycloak client — a correct origin against an unregistered
 URI simply fails differently.
+
+## Follow-up: post-login landing must be /admin, never the public root
+
+A related symptom surfaced only on the deployed box: an operator who requested an
+`/admin` page, got bounced to Keycloak, and logged in landed on the **public
+participant root `/`** instead of the page they asked for (or any admin page).
+
+NextAuth's default `redirect` callback honors a callbackUrl only when it is
+relative or same-origin with the external baseUrl; otherwise it falls back to the
+bare root. Unlike the 0019 fixes above, the precise upstream cause here was not
+pinned (it reproduces only behind traefik, not locally) — candidates are a
+host-string normalization difference in that origin comparison, or the
+`authjs.callback-url` cookie not surviving the cross-site Keycloak return. Rather
+than chase the exact cause, the fix is made robust to all of them:
+
+- **The middleware passes a relative callbackUrl** (`pathname + search`, not the
+  absolute `req.nextUrl.href`). A leading-slash URL skips the origin comparison
+  entirely — the redirect callback just prefixes the external baseUrl — so any
+  host-normalization mismatch is moot.
+- **The `redirect` callback's fallback is `${baseUrl}/admin`, not `${baseUrl}`.**
+  If the callbackUrl is missing or unusable for *any* reason, the operator lands
+  on the admin home rather than the public participant surface (ADR 0004). This
+  is the backstop that guarantees login never dumps an operator on `/`.
+- **The signin page's no-callbackUrl default moves from `/` to `/admin`**, for a
+  direct visit to `/auth/signin` (a bookmark) — that page's only audience is
+  operators.
+
+All three targets stay same-origin with the external baseUrl, so no open-redirect
+surface is introduced.
+

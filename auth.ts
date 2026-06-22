@@ -89,6 +89,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       return refreshAccessToken(token);
     },
+    redirect({ url, baseUrl }) {
+      // Mirrors NextAuth's default same-origin guard, with one change: the
+      // fallback target is /admin, not the bare root. The root `/` is the PUBLIC
+      // participant surface (ADR 0004); an operator finishing login must never
+      // land there. Behind traefik the post-login callbackUrl can be missing or
+      // fail an origin-string comparison for several reasons (host normalization,
+      // a callback-url cookie lost across the Keycloak round-trip), and the stock
+      // fallback would dump the operator on `/`. Sending them to /admin instead
+      // makes login robust regardless of why the callbackUrl was unusable.
+      // See docs/adr/0019-auth-derives-external-origin-from-forwarded-host.md.
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return `${baseUrl}/admin`;
+    },
     session({ session, token }) {
       // accessToken is deliberately NOT exposed here — authedFetch reads it
       // server-side from the encrypted cookie via getToken (see ADR 0014).

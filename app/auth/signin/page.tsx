@@ -6,7 +6,11 @@ import { Suspense, useEffect } from "react";
 
 function SignInRedirect() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  // Default to /admin, not the public participant root: this is the operator
+  // login page, and an operator's home is the admin surface. The proxy always
+  // supplies a callbackUrl for deep links; this default only bites a direct
+  // visit to /auth/signin (e.g. a bookmark).
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
 
   useEffect(() => {
     signIn("keycloak", { callbackUrl });
