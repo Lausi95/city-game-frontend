@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { Trophy } from 'lucide-react';
 import type { BoardResource, TeamResource } from '@/app/types/api';
 
 interface TeamViewProps {
@@ -124,9 +125,9 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
             href="/leaderboard"
             aria-label="Leaderboard"
             title="Leaderboard"
-            className="text-lg leading-none text-zinc-400 transition-colors hover:text-zinc-100"
+            className="text-zinc-400 transition-colors hover:text-zinc-100"
           >
-            🏆
+            <Trophy className="h-5 w-5" aria-hidden="true" />
           </Link>
         </div>
       </header>

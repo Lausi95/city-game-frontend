@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { QrCode } from 'lucide-react';
 import { Modal } from '@/app/components/molecules/Modal';
 
 interface FindQrDialogProps {
@@ -26,7 +27,15 @@ export default function FindQrDialog({ gameId, agentId, onClose }: FindQrDialogP
   const src = `/api/participant/find-qr?gameId=${encodeURIComponent(gameId)}&agentId=${encodeURIComponent(agentId)}`;
 
   return (
-    <Modal title="Find QR" onClose={onClose}>
+    <Modal
+      title={
+        <span className="inline-flex items-center gap-2">
+          <QrCode className="h-4 w-4" aria-hidden="true" />
+          Find QR
+        </span>
+      }
+      onClose={onClose}
+    >
       <div className="flex flex-col items-center gap-4">
         <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
           Show this to a team so they can scan it and record their find.

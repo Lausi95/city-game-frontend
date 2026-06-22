@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ChevronRight, VenetianMask } from 'lucide-react';
 import type { LeaderboardEntry, LeaderboardResource } from '@/app/types/api';
 
 interface LeaderboardProps {
@@ -188,14 +189,12 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
                 </span>{' '}
                 found
               </span>
-              <span
-                className={`w-4 shrink-0 text-center text-zinc-400 transition-transform dark:text-zinc-500 ${
+              <ChevronRight
+                className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform dark:text-zinc-500 ${
                   isExpandable ? '' : 'invisible'
                 } ${isOpen ? 'rotate-90' : ''}`}
-                aria-hidden
-              >
-                ›
-              </span>
+                aria-hidden="true"
+              />
             </button>
 
             {isExpandable && isOpen && (
@@ -205,8 +204,9 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
                     key={`${agent.alias}-${j}`}
                     className="flex items-baseline justify-between gap-3 text-sm"
                   >
-                    <span className="truncate text-zinc-700 dark:text-zinc-300">
-                      🎭 {agent.alias}
+                    <span className="inline-flex min-w-0 items-center gap-1.5 truncate text-zinc-700 dark:text-zinc-300">
+                      <VenetianMask className="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-500" aria-hidden="true" />
+                      {agent.alias}
                     </span>
                     <span className="shrink-0 tabular-nums text-zinc-500 dark:text-zinc-400">
                       {clockTime(agent.foundAt)}{' '}

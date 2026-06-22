@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Pencil, QrCode, Target, Trash2 } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
@@ -13,56 +14,6 @@ import { useAgents } from './AgentsProvider';
 interface TeamsSectionProps {
   gameId: string;
   teams: TeamResource[];
-}
-
-function PencilIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L3.5 10.025a2.25 2.25 0 0 0-.586 1.03l-.66 2.642a.75.75 0 0 0 .91.91l2.642-.66a2.25 2.25 0 0 0 1.03-.586l7.512-7.513a1.75 1.75 0 0 0 0-2.475l-.86-.86ZM4.561 11.086l6.453-6.453.86.86-6.453 6.453a.75.75 0 0 1-.343.195l-1.5.375.375-1.5a.75.75 0 0 1 .195-.343Z" />
-    </svg>
-  );
-}
-
-function TargetIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path
-        fillRule="evenodd"
-        d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM2.5 8a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Zm5.5-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM6.5 8a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path
-        fillRule="evenodd"
-        d="M5 3.25V4H2.75a.75.75 0 0 0 0 1.5h.3l.815 6.527A2 2 0 0 0 5.848 13.5h4.304a2 2 0 0 0 1.983-1.473L12.95 5.5h.3a.75.75 0 0 0 0-1.5H11v-.75A2.25 2.25 0 0 0 8.75 1h-1.5A2.25 2.25 0 0 0 5 3.25Zm2.25-.75a.75.75 0 0 0-.75.75V4h3v-.75a.75.75 0 0 0-.75-.75h-1.5ZM6.05 6a.75.75 0 0 1 .787.713l.275 5.5a.75.75 0 0 1-1.498.075l-.275-5.5A.75.75 0 0 1 6.05 6Zm3.9 0a.75.75 0 0 1 .712.788l-.275 5.5a.75.75 0 0 1-1.498-.075l.275-5.5A.75.75 0 0 1 9.95 6Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
 }
 
 export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
@@ -166,7 +117,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                   aria-label={`Record find for team ${team.name}`}
                   className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
-                  <TargetIcon />
+                  <Target className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -175,15 +126,16 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                   aria-label={`Edit team ${team.name}`}
                   className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
-                  <PencilIcon />
+                  <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>
                 <a
                   href={`/api/admin/games/${gameId}/teams/${team.id}/setup-qr`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`Open setup QR for team ${team.name}`}
                 >
                   <Button variant="ghost" size="sm">
-                    QR
+                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                 </a>
                 <Button
@@ -196,7 +148,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                   aria-label={`Delete team ${team.name}`}
                   className="text-zinc-400 hover:text-red-600"
                 >
-                  <TrashIcon />
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>
               </div>
             </div>

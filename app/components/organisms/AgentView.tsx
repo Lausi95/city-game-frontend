@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { QrCode } from 'lucide-react';
 import { Badge } from '@/app/components/atoms/Badge';
 import { Button } from '@/app/components/atoms/Button';
 import FindQrDialog from '@/app/components/organisms/FindQrDialog';
@@ -203,7 +204,11 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
         )}
 
         {canShowFindQr && (
-          <Button className="w-full" onClick={() => setShowFindQr(true)}>
+          <Button
+            className="flex w-full items-center justify-center gap-2"
+            onClick={() => setShowFindQr(true)}
+          >
+            <QrCode className="h-4 w-4" aria-hidden="true" />
             Show find QR
           </Button>
         )}

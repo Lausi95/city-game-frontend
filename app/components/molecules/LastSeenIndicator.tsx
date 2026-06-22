@@ -1,3 +1,4 @@
+import { Circle } from 'lucide-react';
 import type { AgentLocationResource } from '@/app/types/api';
 
 interface LastSeenIndicatorProps {
@@ -12,11 +13,11 @@ const RECENT_MS = 300_000; // ≤ 5 min → yellow
 type Bucket = 'fresh' | 'recent' | 'stale' | 'none' | 'pending';
 
 const dotClass: Record<Bucket, string> = {
-  fresh: 'bg-green-500',
-  recent: 'bg-yellow-500',
-  stale: 'bg-red-500',
-  none: 'bg-zinc-400',
-  pending: 'bg-zinc-300 dark:bg-zinc-600',
+  fresh: 'text-green-500',
+  recent: 'text-yellow-500',
+  stale: 'text-red-500',
+  none: 'text-zinc-400',
+  pending: 'text-zinc-300 dark:text-zinc-600',
 };
 
 function bucketFor(ageMs: number): Bucket {
@@ -43,7 +44,7 @@ export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
   if (location === null) {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
-        <span className={`h-2 w-2 rounded-full ${dotClass.none}`} aria-hidden="true" />
+        <Circle className={`h-2 w-2 fill-current ${dotClass.none}`} aria-hidden="true" />
         <span>no location</span>
       </span>
     );
@@ -54,7 +55,7 @@ export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
   if (now <= 0) {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
-        <span className={`h-2 w-2 rounded-full ${dotClass.pending}`} aria-hidden="true" />
+        <Circle className={`h-2 w-2 fill-current ${dotClass.pending}`} aria-hidden="true" />
         <span>…</span>
       </span>
     );
@@ -69,7 +70,7 @@ export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
       className="inline-flex items-center gap-1.5 text-xs text-zinc-500"
       aria-label={`Last seen ${label}`}
     >
-      <span className={`h-2 w-2 rounded-full ${dotClass[bucket]}`} aria-hidden="true" />
+      <Circle className={`h-2 w-2 fill-current ${dotClass[bucket]}`} aria-hidden="true" />
       <span>{label}</span>
     </span>
   );

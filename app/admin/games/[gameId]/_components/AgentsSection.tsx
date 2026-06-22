@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Pencil, QrCode } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { Select } from '@/app/components/atoms/Select';
@@ -16,20 +17,6 @@ interface AgentsSectionProps {
   gameId: string;
   /** Whether agent types may still be changed (only before kickoff). */
   canEditType: boolean;
-}
-
-function PencilIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L3.5 10.025a2.25 2.25 0 0 0-.586 1.03l-.66 2.642a.75.75 0 0 0 .91.91l2.642-.66a2.25 2.25 0 0 0 1.03-.586l7.512-7.513a1.75 1.75 0 0 0 0-2.475l-.86-.86ZM4.561 11.086l6.453-6.453.86.86-6.453 6.453a.75.75 0 0 1-.343.195l-1.5.375.375-1.5a.75.75 0 0 1 .195-.343Z" />
-    </svg>
-  );
 }
 
 const defaultForm = {
@@ -203,15 +190,16 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                   aria-label={`Edit agent ${agent.alias}`}
                   className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
-                  <PencilIcon />
+                  <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>
                 <a
                   href={`/api/admin/games/${gameId}/agents/${agent.id}/setup-qr`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`Open setup QR for agent ${agent.alias}`}
                 >
                   <Button variant="ghost" size="sm">
-                    QR
+                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                 </a>
               </div>

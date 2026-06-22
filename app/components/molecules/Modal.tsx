@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from 'react';
 
 interface ModalProps {
-  title?: string;
+  title?: ReactNode;
   onClose: () => void;
   children: ReactNode;
   className?: string;
