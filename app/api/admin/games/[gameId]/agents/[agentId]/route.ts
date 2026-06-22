@@ -22,3 +22,21 @@ export async function PATCH(
   const data = await res.json().catch(() => null);
   return data ? NextResponse.json(data) : new NextResponse(null, { status: 204 });
 }
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ gameId: string; agentId: string }> },
+) {
+  const { gameId, agentId } = await params;
+
+  const res = await authedFetch(`/games/${gameId}/agents/${agentId}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ detail: res.statusText }));
+    return NextResponse.json(error, { status: res.status });
+  }
+
+  return new NextResponse(null, { status: 204 });
+}

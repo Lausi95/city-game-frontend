@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Pencil, QrCode } from 'lucide-react';
+import { Pencil, QrCode, Trash2 } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Tooltip } from '@/app/components/molecules/Tooltip';
 import { Input } from '@/app/components/atoms/Input';
@@ -13,6 +13,7 @@ import { Badge } from '@/app/components/atoms/Badge';
 import { LastSeenIndicator } from '@/app/components/molecules/LastSeenIndicator';
 import EditAgentDialog from '@/app/components/organisms/EditAgentDialog';
 import SetupQrDialog from '@/app/components/organisms/SetupQrDialog';
+import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
 import { useAgents } from './AgentsProvider';
 import type { AgentResource } from '@/app/types/api';
 
@@ -42,6 +43,9 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
 
   const [agentToEdit, setAgentToEdit] = useState<AgentResource | null>(null);
   const [agentToShowQr, setAgentToShowQr] = useState<AgentResource | null>(null);
+  const [agentToDelete, setAgentToDelete] = useState<AgentResource | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Live agent state + wall-clock are owned by AgentsProvider so the list and
   // the map share one polled source. See docs/adr/0003 and docs/adr/0006.
@@ -83,6 +87,30 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
       setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!agentToDelete) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+
+    try {
+      const res = await fetch(`/api/admin/games/${gameId}/agents/${agentToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail ?? 'Agent konnte nicht gelöscht werden');
+      }
+
+      setAgentToDelete(null);
+      router.refresh();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -237,6 +265,17 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                     <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                 </Tooltip>
+                <Tooltip label="Löschen">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAgentToDelete(agent)}
+                    aria-label={`Agent ${agent.alias} löschen`}
+                    className="text-zinc-400 hover:text-red-600"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
               </div>
             </div>
           ))}
@@ -258,6 +297,23 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
           src={`/api/admin/games/${gameId}/agents/${agentToShowQr.id}/setup-qr`}
           printName={agentToShowQr.alias}
           onClose={() => setAgentToShowQr(null)}
+        />
+      )}
+
+      {agentToDelete && (
+        <ConfirmDialog
+          title="Agent löschen"
+          description={`„${agentToDelete.alias}" (${agentToDelete.firstName} ${agentToDelete.lastName}) löschen? Das kann nicht rückgängig gemacht werden.`}
+          confirmLabel="Löschen"
+          onConfirm={handleDelete}
+          onCancel={() => {
+            if (!deleteLoading) {
+              setAgentToDelete(null);
+              setDeleteError(null);
+            }
+          }}
+          loading={deleteLoading}
+          error={deleteError}
         />
       )}
     </div>
