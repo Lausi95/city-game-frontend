@@ -20,7 +20,7 @@ const AgentBoundsMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-sm text-zinc-400 dark:bg-zinc-900">
+      <div className="flex h-full w-full items-center justify-center bg-surface-raised text-sm text-muted">
         Karte wird geladen …
       </div>
     ),
@@ -148,7 +148,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
   if (load === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
+        <p className="animate-pulse text-sm text-muted">Wird geladen …</p>
       </Shell>
     );
   }
@@ -156,7 +156,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
   if (load === 'error' || !agent) {
     return (
       <Shell>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-muted">
           Deine Agentendaten konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
         </p>
       </Shell>
@@ -170,13 +170,13 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
   const canShowFindQr = agent.type === 'MISTERX' && agent.active;
 
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-zinc-50 font-sans dark:bg-black">
+    <div className="min-h-[calc(100vh-65px)] bg-background font-sans">
       <main className="mx-auto flex w-full max-w-md flex-col gap-5 px-5 py-8">
         <header className="flex flex-col gap-1">
-          <h2 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
             {agent.alias}
           </h2>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             {agent.active
               ? 'Du bist im Spiel. Bleib in Bewegung.'
               : 'Du bist derzeit inaktiv — die Teams jagen dich gerade nicht.'}
@@ -186,7 +186,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
         {banner && (
           <p
             role="status"
-            className="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200"
+            className="rounded-md border border-warning/30 bg-warning/15 px-3 py-2 text-sm text-warning"
           >
             {banner}
           </p>
@@ -197,7 +197,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
         {bounds === 'out' && (
           <p
             role="alert"
-            className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
+            className="rounded-md border border-danger/30 bg-danger/15 px-3 py-2 text-sm font-medium text-danger"
           >
             Du bist außerhalb des Spielfelds — geh zurück ins Spielgebiet.
           </p>
@@ -215,12 +215,12 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
 
         <div className="grid grid-cols-2 gap-3">
           <StatTile label="Typ">
-            <Badge color={agent.type === 'MISTERX' ? 'red' : 'blue'}>
+            <Badge color={agent.type === 'MISTERX' ? 'misterx' : 'utility'}>
               {TYPE_LABELS[agent.type]}
             </Badge>
           </StatTile>
           <StatTile label="Status">
-            <Badge color={agent.active ? 'green' : 'zinc'}>
+            <Badge color={agent.active ? 'success' : 'neutral'}>
               {agent.active ? 'Aktiv' : 'Inaktiv'}
             </Badge>
           </StatTile>
@@ -240,15 +240,15 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
               <div className="col-span-2">
                 <StatTile label="Spielfeld">
                   {bounds === 'in' ? (
-                    <Badge color="green">Im Spielfeld</Badge>
+                    <Badge color="success">Im Spielfeld</Badge>
                   ) : bounds === 'out' ? (
-                    <Badge color="red">Außerhalb</Badge>
+                    <Badge color="danger">Außerhalb</Badge>
                   ) : (
-                    <span className="text-zinc-500">Wird geortet …</span>
+                    <span className="text-muted">Wird geortet …</span>
                   )}
                 </StatTile>
               </div>
-              <div className="col-span-2 h-56 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+              <div className="col-span-2 h-56 overflow-hidden rounded-lg border border-border">
                 <AgentBoundsMap
                   map={map}
                   position={fix}
@@ -261,9 +261,9 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
           <div className="col-span-2">
             <StatTile label="Gefunden von">
               {agent.foundByTeams.length === 0 ? (
-                <span className="text-zinc-500">Noch nicht gefunden</span>
+                <span className="text-muted">Noch nicht gefunden</span>
               ) : (
-                <ul className="flex flex-col divide-y divide-zinc-100 dark:divide-zinc-800">
+                <ul className="flex flex-col divide-y divide-border">
                   {agent.foundByTeams.map((team) => (
                     <li
                       key={team.id}
@@ -293,7 +293,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
 /** Centered shell for the loading/error states, matching the participant surfaces. */
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-background font-sans">
       {children}
     </div>
   );

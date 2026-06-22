@@ -24,8 +24,8 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal title={title} onClose={onCancel}>
-      <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">{description}</p>
-      {error && <p className="mb-4 text-xs text-red-600">{error}</p>}
+      <p className="mb-4 text-sm text-muted">{description}</p>
+      {error && <p className="mb-4 text-xs text-danger">{error}</p>}
       <div className="flex justify-end gap-2">
         <Button variant="secondary" size="sm" onClick={onCancel} disabled={loading} autoFocus>
           Abbrechen

@@ -12,7 +12,7 @@ import type { Corner } from '@/app/components/organisms/MapSelector';
 const MapSelector = dynamic(() => import('@/app/components/organisms/MapSelector'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-96 w-full animate-pulse items-center justify-center rounded-md bg-zinc-100 text-sm text-zinc-400">
+    <div className="flex h-96 w-full animate-pulse items-center justify-center rounded-md bg-surface-raised text-sm text-muted">
       Karte wird geladen …
     </div>
   ),
@@ -153,7 +153,7 @@ export default function EditGameForm({
             />
           </FormField>
           {startInPast && (
-            <p className="rounded-md bg-yellow-50 px-3 py-2 text-xs text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+            <p className="rounded-md bg-warning/15 px-3 py-2 text-xs text-warning">
               Dieses Datum liegt in der Vergangenheit und hat keine echte Wirkung.
             </p>
           )}
@@ -169,7 +169,7 @@ export default function EditGameForm({
             />
           </FormField>
           {endInPast && (
-            <p className="rounded-md bg-yellow-50 px-3 py-2 text-xs text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+            <p className="rounded-md bg-warning/15 px-3 py-2 text-xs text-warning">
               Dieses Datum liegt in der Vergangenheit und hat keine echte Wirkung.
             </p>
           )}
@@ -177,7 +177,7 @@ export default function EditGameForm({
       </div>
 
       <div>
-        <h3 className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Spielfeld</h3>
+        <h3 className="mb-3 text-sm font-medium text-muted">Spielfeld</h3>
         <div className="mb-3 grid grid-cols-2 gap-4">
           <FormField label="Zeilen" htmlFor="rows">
             <Input
@@ -210,7 +210,7 @@ export default function EditGameForm({
       </div>
 
       {error && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="rounded-md bg-danger/15 px-3 py-2 text-sm text-danger">
           {error}
         </p>
       )}

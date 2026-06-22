@@ -99,7 +99,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
   return (
     <div>
       <h2 className="mb-1 text-lg font-medium">Teams</h2>
-      <p className="mb-4 text-xs text-zinc-500">
+      <p className="mb-4 text-xs text-muted">
         QR-Code scannen, um ein Gerät diesem Team zuzuweisen. Am besten ausdrucken, damit
         Teammitglieder ihre Geräte selbst einrichten können.
       </p>
@@ -116,7 +116,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
         </Button>
       </form>
 
-      {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mb-2 text-xs text-danger">{error}</p>}
 
       {teams.length > 0 && (
         <Pagination
@@ -128,14 +128,14 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
       )}
 
       {teams.length === 0 ? (
-        <p className="text-sm text-zinc-500">Noch keine Teams.</p>
+        <p className="text-sm text-muted">Noch keine Teams.</p>
       ) : (
-        <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
+        <div className="divide-y divide-border rounded-lg border border-border">
           {visibleTeams.map((team) => (
             <div key={team.id} className="flex items-center justify-between px-3 py-2.5">
               <div>
                 <p className="text-sm font-medium">{team.name}</p>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted">
                   {team.memberCount} {team.memberCount === 1 ? 'Mitglied' : 'Mitglieder'} ·{' '}
                   {team.foundAgents.length} gefunden
                 </p>
@@ -147,7 +147,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                     size="sm"
                     onClick={() => setTeamToRecordFind(team)}
                     aria-label={`Fund für Team ${team.name} erfassen`}
-                    className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    className="text-muted hover:text-foreground"
                   >
                     <Target className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
@@ -158,7 +158,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                     size="sm"
                     onClick={() => setTeamToEdit(team)}
                     aria-label={`Team ${team.name} bearbeiten`}
-                    className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    className="text-muted hover:text-foreground"
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
@@ -182,7 +182,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                       setTeamToDelete(team);
                     }}
                     aria-label={`Team ${team.name} löschen`}
-                    className="text-zinc-400 hover:text-red-600"
+                    className="text-muted hover:text-danger"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>

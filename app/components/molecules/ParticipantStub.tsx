@@ -26,24 +26,24 @@ export default function ParticipantStub({
   comingSoon,
 }: ParticipantStubProps) {
   return (
-    <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-[calc(100vh-65px)] items-center justify-center">
       <main className="flex w-full max-w-md flex-col items-center gap-6 px-8 text-center">
         <div className="flex flex-col items-center gap-2">
-          <h2 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+          <h2 className="text-3xl tracking-tight text-foreground">
             {title}
           </h2>
-          <p className="text-lg text-zinc-600 dark:text-zinc-400">{subtitle}</p>
+          <p className="text-lg text-muted">{subtitle}</p>
         </div>
 
         {fields && fields.length > 0 && (
-          <dl className="w-full divide-y divide-zinc-200 rounded-lg border border-zinc-200 text-left dark:divide-zinc-800 dark:border-zinc-800">
+          <dl className="w-full divide-y divide-border rounded-lg border border-border bg-surface text-left">
             {fields.map((field) => (
               <div
                 key={field.label}
                 className="flex items-center justify-between gap-4 px-4 py-2.5"
               >
-                <dt className="text-sm text-zinc-500">{field.label}</dt>
-                <dd className="font-mono text-sm text-zinc-800 dark:text-zinc-200">
+                <dt className="text-sm text-muted">{field.label}</dt>
+                <dd className="font-mono text-sm text-foreground">
                   {field.value}
                 </dd>
               </div>
@@ -52,7 +52,7 @@ export default function ParticipantStub({
         )}
 
         {comingSoon && (
-          <p className="rounded-md border border-dashed border-zinc-300 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-700">
+          <p className="rounded-md border border-dashed border-border-strong px-4 py-3 text-sm text-muted">
             {comingSoon}
           </p>
         )}

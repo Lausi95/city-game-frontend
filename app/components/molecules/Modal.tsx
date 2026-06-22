@@ -23,15 +23,15 @@ export function Modal({ title, onClose, children, className }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className={`w-full max-w-sm rounded-lg bg-white p-6 shadow-lg dark:bg-zinc-900 ${className ?? ''}`}
+        className={`w-full max-w-sm rounded-lg border border-border bg-surface-overlay p-6 shadow-2xl shadow-black/50 ${className ?? ''}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-2 flex items-start justify-between gap-2">
-          {title ? <h3 className="text-base font-semibold">{title}</h3> : null}
+          {title ? <h3 className="text-base text-foreground">{title}</h3> : null}
           <div className="ml-auto">
             <Tooltip label="Schließen">
               <Button
@@ -39,7 +39,7 @@ export function Modal({ title, onClose, children, className }: ModalProps) {
                 size="sm"
                 onClick={onClose}
                 aria-label="Schließen"
-                className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                className="text-muted hover:text-foreground"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </Button>

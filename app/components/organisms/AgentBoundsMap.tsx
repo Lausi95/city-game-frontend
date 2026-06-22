@@ -10,6 +10,7 @@ import {
   useMap,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { mapColor, TILE_URL, TILE_ATTRIBUTION } from '@/app/lib/mapTheme';
 import type { GeoLocation, MapDto } from '@/app/types/api';
 
 interface AgentBoundsMapProps {
@@ -20,9 +21,9 @@ interface AgentBoundsMapProps {
   outOfBounds: boolean;
 }
 
-const IN_BOUNDS_BLUE = '#2563eb';
-const OUT_OF_BOUNDS_RED = '#dc2626';
-const PLAYFIELD_OUTLINE = '#64748b';
+const IN_BOUNDS_FOG = mapColor('--color-utility');
+const OUT_OF_BOUNDS_RED = mapColor('--color-danger');
+const PLAYFIELD_OUTLINE = mapColor('--color-utility');
 
 /** Geographic extent of the playfield, normalised so cornerA/B order doesn't matter. */
 function extentOf(map: MapDto) {
@@ -73,10 +74,7 @@ export default function AgentBoundsMap({ map, position, outOfBounds }: AgentBoun
 
   return (
     <MapContainer bounds={rect} className="h-full w-full">
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; OpenStreetMap contributors"
-      />
+      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
       {/* The playfield outline — no grid, no other agents. */}
       <Rectangle
         bounds={rect}
@@ -89,7 +87,7 @@ export default function AgentBoundsMap({ map, position, outOfBounds }: AgentBoun
           pathOptions={{
             color: '#ffffff',
             weight: 2,
-            fillColor: outOfBounds ? OUT_OF_BOUNDS_RED : IN_BOUNDS_BLUE,
+            fillColor: outOfBounds ? OUT_OF_BOUNDS_RED : IN_BOUNDS_FOG,
             fillOpacity: 1,
           }}
         />

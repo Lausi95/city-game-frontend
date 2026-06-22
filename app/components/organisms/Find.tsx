@@ -41,7 +41,7 @@ interface Fix {
 /** Shared centered shell, mirroring SetupAgent / SetupTeam so the surfaces match. */
 function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-background font-sans">
       <main className="flex w-full max-w-md flex-col items-center gap-6 px-8 text-center">
         {children}
       </main>
@@ -52,10 +52,10 @@ function Shell({ children }: { children: ReactNode }) {
 function Heading({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <h2 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+      <h2 className="text-3xl font-semibold tracking-tight text-foreground">
         {title}
       </h2>
-      <p className="text-lg text-zinc-600 dark:text-zinc-400">{subtitle}</p>
+      <p className="text-lg text-muted">{subtitle}</p>
     </div>
   );
 }
@@ -171,7 +171,7 @@ export default function Find({ agentId, alias }: FindProps) {
   if (stored === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
+        <p className="animate-pulse text-sm text-muted">Wird geladen …</p>
       </Shell>
     );
   }
@@ -192,7 +192,7 @@ export default function Find({ agentId, alias }: FindProps) {
   if (phase === 'submitting') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Fund wird erfasst …</p>
+        <p className="animate-pulse text-sm text-muted">Fund wird erfasst …</p>
       </Shell>
     );
   }

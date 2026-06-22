@@ -72,7 +72,7 @@ export default function EditTeamDialog({ gameId, team, onClose }: EditTeamDialog
           />
         </FormField>
 
-        {error && <p className="text-xs text-red-600">{error}</p>}
+        {error && <p className="text-xs text-danger">{error}</p>}
 
         <div className="flex justify-end gap-2">
           <Button

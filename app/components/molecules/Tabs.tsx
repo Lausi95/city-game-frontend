@@ -18,7 +18,7 @@ interface TabsProps {
  */
 export function Tabs({ tabs, activeId, onChange }: TabsProps) {
   return (
-    <div className="flex gap-6 border-b border-zinc-200" role="tablist">
+    <div className="flex gap-6 border-b border-border" role="tablist">
       {tabs.map((tab) => {
         const active = tab.id === activeId;
         return (
@@ -30,8 +30,8 @@ export function Tabs({ tabs, activeId, onChange }: TabsProps) {
             onClick={() => onChange(tab.id)}
             className={`-mb-px cursor-pointer border-b-2 px-1 pb-2.5 text-sm font-medium transition-colors ${
               active
-                ? 'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100'
-                : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                ? 'border-accent text-foreground'
+                : 'border-transparent text-muted hover:text-foreground'
             }`}
           >
             {tab.label}

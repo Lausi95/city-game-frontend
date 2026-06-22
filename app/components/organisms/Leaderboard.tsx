@@ -108,9 +108,9 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
 
   if (load === 'loading') {
     return (
-      <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+      <ul className="divide-y divide-border">
         {[0, 1, 2, 3].map((i) => (
-          <li key={i} className="h-14 animate-pulse bg-zinc-100/60 dark:bg-zinc-900/60" />
+          <li key={i} className="h-14 animate-pulse bg-surface-raised" />
         ))}
       </ul>
     );
@@ -119,7 +119,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
   if (load === 'error' || !data) {
     return (
       <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           Die Rangliste konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
         </p>
         <button
@@ -128,7 +128,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
             setLoad('loading');
             void refresh().then((ok) => setLoad(ok ? 'ready' : 'error'));
           }}
-          className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          className="rounded-md border border-border-strong bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-raised"
         >
           Erneut versuchen
         </button>
@@ -138,14 +138,14 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
 
   if (teams.length === 0) {
     return (
-      <p className="px-6 py-16 text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="px-6 py-16 text-center text-sm text-muted">
         Noch keine Teams in diesem Spiel.
       </p>
     );
   }
 
   return (
-    <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+    <ul className="divide-y divide-border">
       {teams.map((team, i) => {
         const rank = ranks[i];
         const isExpandable = team.foundCount > 0;
@@ -157,7 +157,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
             key={team.teamId}
             className={
               isYou
-                ? 'border-l-2 border-l-blue-500 bg-blue-50 dark:bg-blue-950/30'
+                ? 'border-l-2 border-l-accent bg-utility/15'
                 : undefined
             }
           >
@@ -168,29 +168,29 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
               disabled={!isExpandable}
               className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
                 isExpandable
-                  ? 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? 'cursor-pointer hover:bg-surface-raised'
                   : 'cursor-default'
               }`}
             >
-              <span className="w-6 shrink-0 text-center text-sm font-semibold tabular-nums text-zinc-400 dark:text-zinc-500">
+              <span className="w-6 shrink-0 text-center text-sm font-semibold tabular-nums text-muted">
                 {rank ?? '—'}
               </span>
-              <span className="min-w-0 flex-1 truncate font-medium text-zinc-900 dark:text-zinc-100">
+              <span className="min-w-0 flex-1 truncate font-medium text-foreground">
                 {team.teamName}
                 {isYou && (
-                  <span className="ml-2 text-xs font-normal text-blue-600 dark:text-blue-400">
+                  <span className="ml-2 text-xs font-normal text-accent">
                     du
                   </span>
                 )}
               </span>
-              <span className="shrink-0 text-sm text-zinc-500 dark:text-zinc-400">
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+              <span className="shrink-0 text-sm text-muted">
+                <span className="font-semibold text-foreground">
                   {team.foundCount}
                 </span>{' '}
                 gefunden
               </span>
               <ChevronRight
-                className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform dark:text-zinc-500 ${
+                className={`h-4 w-4 shrink-0 text-muted transition-transform ${
                   isExpandable ? '' : 'invisible'
                 } ${isOpen ? 'rotate-90' : ''}`}
                 aria-hidden="true"
@@ -198,19 +198,19 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
             </button>
 
             {isExpandable && isOpen && (
-              <ul className="space-y-1 bg-zinc-50/60 px-4 pb-3 pl-13 dark:bg-zinc-900/40">
+              <ul className="space-y-1 bg-surface-raised px-4 pb-3 pl-13">
                 {team.agents.map((agent, j) => (
                   <li
                     key={`${agent.alias}-${j}`}
                     className="flex items-baseline justify-between gap-3 text-sm"
                   >
-                    <span className="inline-flex min-w-0 items-center gap-1.5 truncate text-zinc-700 dark:text-zinc-300">
-                      <VenetianMask className="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-500" aria-hidden="true" />
+                    <span className="inline-flex min-w-0 items-center gap-1.5 truncate text-muted">
+                      <VenetianMask className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
                       {agent.alias}
                     </span>
-                    <span className="shrink-0 tabular-nums text-zinc-500 dark:text-zinc-400">
+                    <span className="shrink-0 tabular-nums text-muted">
                       {clockTime(agent.foundAt)}{' '}
-                      <span className="text-zinc-400 dark:text-zinc-500">
+                      <span className="text-muted">
                         ({relativeAge(agent.foundAt, now)})
                       </span>
                     </span>

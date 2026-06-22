@@ -36,8 +36,8 @@ export default function ParticipantRoot() {
 
   if (identity === 'loading') {
     return (
-      <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
+      <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-background font-sans">
+        <p className="animate-pulse text-sm text-muted">Wird geladen …</p>
       </div>
     );
   }

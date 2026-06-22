@@ -22,27 +22,27 @@ export default async function AdminPage({
       </div>
 
       {games.empty ? (
-        <div className="rounded-lg border border-dashed border-zinc-300 p-12 text-center text-zinc-500">
+        <div className="rounded-lg border border-dashed border-border-strong p-12 text-center text-muted">
           Noch keine Spiele. Erstelle dein erstes Spiel.
         </div>
       ) : (
-        <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
+        <div className="divide-y divide-border rounded-lg border border-border">
           {games.content.map((game) => (
             <Link
               key={game.id}
               href={`/admin/games/${game.id}`}
-              className="flex items-center justify-between px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+              className="flex items-center justify-between px-4 py-3 hover:bg-surface"
             >
               <div>
                 <p className="font-medium">{game.title}</p>
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-muted">
                   {new Date(game.startTime).toLocaleString('de-DE')} –{' '}
                   {new Date(game.endTime).toLocaleString('de-DE')}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Badge color="blue">{game.teams} Teams</Badge>
-                <Badge color="zinc">{game.agents} Agenten</Badge>
+                <Badge color="utility">{game.teams} Teams</Badge>
+                <Badge color="neutral">{game.agents} Agenten</Badge>
               </div>
             </Link>
           ))}
@@ -58,7 +58,7 @@ export default async function AdminPage({
               </Button>
             </Link>
           )}
-          <span className="text-sm text-zinc-500">
+          <span className="text-sm text-muted">
             Seite {page + 1} von {games.totalPages}
           </span>
           {!games.last && (

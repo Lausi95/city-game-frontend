@@ -12,6 +12,7 @@ import {
   Popup,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { mapColor, TILE_URL, TILE_ATTRIBUTION } from '@/app/lib/mapTheme';
 import type {
   MapDto,
   BoardMisterxAgent,
@@ -25,8 +26,8 @@ interface BoardMapProps {
   utilityAgents: BoardUtilityAgent[];
 }
 
-const MISTERX_RED = '#dc2626';
-const UTILITY_BLUE = '#2563eb';
+const MISTERX_BRASS = mapColor('--color-misterx');
+const UTILITY_FOG = mapColor('--color-utility');
 
 /** Geographic extent of the map area, normalised so cornerA/B order doesn't matter. */
 function extentOf(map: MapDto) {
@@ -63,12 +64,12 @@ function GridOverlay({ map }: { map: MapDto }) {
 
   return (
     <>
-      <Polyline positions={border} pathOptions={{ color: '#64748b', weight: 2 }} />
+      <Polyline positions={border} pathOptions={{ color: mapColor('--color-utility'), weight: 2 }} />
       {hLines.map((line, i) => (
-        <Polyline key={`h${i}`} positions={line} pathOptions={{ color: '#64748b', weight: 1, opacity: 0.4 }} />
+        <Polyline key={`h${i}`} positions={line} pathOptions={{ color: mapColor('--color-grid'), weight: 1, opacity: 0.6 }} />
       ))}
       {vLines.map((line, j) => (
-        <Polyline key={`v${j}`} positions={line} pathOptions={{ color: '#64748b', weight: 1, opacity: 0.4 }} />
+        <Polyline key={`v${j}`} positions={line} pathOptions={{ color: mapColor('--color-grid'), weight: 1, opacity: 0.6 }} />
       ))}
     </>
   );
@@ -115,10 +116,7 @@ export default function BoardMap({ map, misterxAgents, utilityAgents }: BoardMap
       maxBoundsViscosity={1.0}
       className="h-full w-full"
     >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; OpenStreetMap contributors"
-      />
+      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
       <GridOverlay map={map} />
 
       {Array.from(cells.entries()).map(([key, { cell, aliases }]) => {
@@ -131,7 +129,7 @@ export default function BoardMap({ map, misterxAgents, utilityAgents }: BoardMap
           <Fragment key={key}>
             <Rectangle
               bounds={cb}
-              pathOptions={{ color: MISTERX_RED, weight: 1, fillColor: MISTERX_RED, fillOpacity: 0.4 }}
+              pathOptions={{ color: MISTERX_BRASS, weight: 1, fillColor: MISTERX_BRASS, fillOpacity: 0.4 }}
             >
               <Popup>
                 <span className="font-medium">
@@ -149,7 +147,7 @@ export default function BoardMap({ map, misterxAgents, utilityAgents }: BoardMap
                   className: '',
                   iconSize: [40, 40],
                   iconAnchor: [20, 20],
-                  html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;font:700 22px/1 sans-serif;color:#7f1d1d;opacity:0.55;pointer-events:none;">${aliases.length}</div>`,
+                  html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;font:700 22px/1 sans-serif;color:${MISTERX_BRASS};opacity:0.7;pointer-events:none;">${aliases.length}</div>`,
                 })}
               />
             )}
@@ -162,7 +160,7 @@ export default function BoardMap({ map, misterxAgents, utilityAgents }: BoardMap
           key={u.id}
           center={[u.geoLocation.latitude, u.geoLocation.longitude]}
           radius={7}
-          pathOptions={{ color: '#ffffff', weight: 2, fillColor: UTILITY_BLUE, fillOpacity: 1 }}
+          pathOptions={{ color: '#ffffff', weight: 2, fillColor: UTILITY_FOG, fillOpacity: 1 }}
         >
           <Popup>
             <span className="font-medium">{u.alias}</span>

@@ -1,26 +1,144 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Scotland Yard visual identity — see docs/adr/0031-scotland-yard-visual-identity.md.
+ * Dark-only theme on a semantic token layer — see docs/adr/0030-dark-only-theme-on-a-semantic-token-layer.md.
+ *
+ * This @theme block is the SINGLE place the palette and type live. Components
+ * reference roles (bg-surface, text-muted, font-display), never raw hues.
+ */
+@theme {
+  /* Surfaces — cool desaturated "London fog", stepped in small low-contrast increments. */
+  --color-background: #0f1217; /* page */
+  --color-surface: #14171d; /* default surface / calm data panels */
+  --color-surface-raised: #1b1f27; /* cards, list rows, inputs */
+  --color-surface-overlay: #242a34; /* modals, popovers, tooltips */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Borders — hairline, barely-there; -strong for inputs/dividers that must read. */
+  --color-border: oklch(72% 0.02 255 / 0.12);
+  --color-border-strong: oklch(72% 0.02 255 / 0.24);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Text — soft off-white, never pure #fff, to hold the low-contrast feel. */
+  --color-foreground: #c5cad3;
+  --color-muted: #8b929e;
+  --color-faint: #5c636f;
+
+  /* Accent — gaslight brass. One warm accent on cool ground. */
+  --color-accent: #c9a45c;
+  --color-accent-hover: #d8b673;
+  --color-accent-contrast: #15171b; /* dark text on a brass fill */
+
+  /* Status — ordered good→bad ramp; doubles as freshness (ADR 0003) + destructive. */
+  --color-success: #6f8f6a;
+  --color-warning: #c9a45c;
+  --color-danger: #b5675f;
+  --color-danger-hover: #c4756c;
+
+  /* Scotland Yard transport hues — categorical badges only (ADR 0031). */
+  --color-taxi: #d4b15e; /* yellow */
+  --color-bus: #6f8f6a; /* green */
+  --color-tube: #b5675f; /* red */
+
+  /* Game roles — also drive the Leaflet map overlays (read via app/lib/mapTheme.ts). */
+  --color-misterx: #c9a45c; /* the hunted identity — brass, special */
+  --color-utility: #6b86b0; /* detective/decoy — desaturated fog-blue */
+  --color-grid: #3a424f; /* faint board grid lines */
+
+  /* Type — a detective case-file dossier system. Faces loaded in layout.tsx. */
+  --font-display: var(--font-special-elite), ui-serif, Georgia, serif;
+  --font-body: var(--font-lora), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+  /* Rich chrome: a faint fog vignette behind everything (ADR 0030/0031). */
+  background-image: radial-gradient(
+    120% 90% at 50% -10%,
+    #161b23 0%,
+    var(--color-background) 60%
+  );
+  background-attachment: fixed;
+}
+
+/* Film grain — a subtle fixed noise layer. z-index:-1 keeps it above the fog
+ * background but BEHIND all content, so it never muddies text. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Headings and the wordmark wear the dossier display face. */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Tabular data, IDs and coordinates read in mono. */
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+}
+
+/*
+ * Leaflet maps — fog the CARTO dark tiles toward the palette and re-skin the
+ * default white chrome (attribution, zoom controls). See ADR 0031.
+ */
+.leaflet-container {
+  background: var(--color-background);
+  font-family: var(--font-body);
+}
+
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent) !important;
+  color: var(--color-faint) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-muted) !important;
+}
+
+.leaflet-bar a {
+  background: var(--color-surface-raised) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+}
+
+.leaflet-bar a:hover {
+  background: var(--color-surface-overlay) !important;
+}
+
+/* Marker tooltips inherit the dossier overlay surface. */
+.leaflet-tooltip {
+  background: var(--color-surface-overlay) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border-strong) !important;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.4) !important;
+}
+
+.leaflet-tooltip-top::before {
+  border-top-color: var(--color-border-strong) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-surface-overlay) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.5) !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--color-muted) !important;
 }

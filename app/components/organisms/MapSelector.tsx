@@ -10,6 +10,7 @@ import {
   Polyline,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { mapColor, TILE_URL, TILE_ATTRIBUTION } from '@/app/lib/mapTheme';
 import type { LatLng } from 'leaflet';
 
 export interface Corner {
@@ -129,21 +130,24 @@ function GridOverlay({
     vLines.push([[minLat, lng], [maxLat, lng]]);
   }
 
+  const outline = mapColor('--color-utility');
+  const gridLine = mapColor('--color-grid');
+
   return (
     <>
-      <Polyline positions={border} pathOptions={{ color: '#2563eb', weight: 2 }} />
+      <Polyline positions={border} pathOptions={{ color: outline, weight: 2 }} />
       {hLines.map((line, i) => (
         <Polyline
           key={`h${i}`}
           positions={line}
-          pathOptions={{ color: '#2563eb', weight: 1, opacity: 0.5 }}
+          pathOptions={{ color: gridLine, weight: 1, opacity: 0.6 }}
         />
       ))}
       {vLines.map((line, j) => (
         <Polyline
           key={`v${j}`}
           positions={line}
-          pathOptions={{ color: '#2563eb', weight: 1, opacity: 0.5 }}
+          pathOptions={{ color: gridLine, weight: 1, opacity: 0.6 }}
         />
       ))}
     </>
@@ -164,7 +168,7 @@ export default function MapSelector({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-muted">
         {step === 0 && 'Tippe auf die Karte, um Ecke A zu setzen (rot dargestellt)'}
         {step === 1 && 'Tippe auf die Karte, um Ecke B zu setzen (grün dargestellt)'}
         {step === 2 && 'Tippe auf die Karte, um zurückzusetzen und neue Ecken zu wählen'}
@@ -172,12 +176,9 @@ export default function MapSelector({
       <MapContainer
         center={[51.505, -0.09]}
         zoom={13}
-        className="h-96 w-full rounded-md border border-zinc-200"
+        className="h-96 w-full rounded-md border border-border"
       >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
-        />
+        <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
         <ClickHandler step={step} onCornerA={handleCornerA} onCornerB={handleCornerB} />
         <BoundsFitter cornerA={cornerA} cornerB={cornerB} />
         {!cornerA && !cornerB && <LocationCenterer />}
@@ -185,30 +186,30 @@ export default function MapSelector({
           <CircleMarker
             center={[cornerA.lat, cornerA.lng]}
             radius={8}
-            pathOptions={{ color: '#dc2626', fillColor: '#dc2626', fillOpacity: 1 }}
+            pathOptions={{ color: mapColor('--color-danger'), fillColor: mapColor('--color-danger'), fillOpacity: 1 }}
           />
         )}
         {cornerB && (
           <CircleMarker
             center={[cornerB.lat, cornerB.lng]}
             radius={8}
-            pathOptions={{ color: '#16a34a', fillColor: '#16a34a', fillOpacity: 1 }}
+            pathOptions={{ color: mapColor('--color-success'), fillColor: mapColor('--color-success'), fillOpacity: 1 }}
           />
         )}
         {cornerA && cornerB && (
           <GridOverlay cornerA={cornerA} cornerB={cornerB} rows={rows} columns={columns} />
         )}
       </MapContainer>
-      <div className="flex gap-6 text-xs text-zinc-500">
+      <div className="flex gap-6 text-xs text-muted">
         {cornerA && (
           <span>
-            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-red-600" />A:{' '}
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-danger" />A:{' '}
             {cornerA.lat.toFixed(6)}, {cornerA.lng.toFixed(6)}
           </span>
         )}
         {cornerB && (
           <span>
-            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-green-600" />B:{' '}
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-success" />B:{' '}
             {cornerB.lat.toFixed(6)}, {cornerB.lng.toFixed(6)}
           </span>
         )}

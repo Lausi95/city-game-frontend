@@ -22,7 +22,7 @@ export function Tooltip({ label, children }: TooltipProps) {
       {children}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute top-full right-0 z-10 mt-1 whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-xs font-medium text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-zinc-700"
+        className="pointer-events-none absolute top-full right-0 z-10 mt-1 whitespace-nowrap rounded-md border border-border-strong bg-surface-overlay px-2 py-1 text-xs font-medium text-foreground opacity-0 shadow-lg shadow-black/40 group-hover:opacity-100 group-focus-within:opacity-100"
       >
         {label}
       </span>

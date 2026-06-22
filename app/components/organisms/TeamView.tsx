@@ -17,7 +17,7 @@ type Load = 'loading' | 'ready' | 'error';
 const BoardMap = dynamic(() => import('@/app/components/organisms/BoardMap'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-sm text-zinc-400 dark:bg-zinc-900">
+    <div className="flex h-full w-full items-center justify-center bg-surface-raised text-sm text-muted">
       Karte wird geladen …
     </div>
   ),
@@ -101,7 +101,7 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
   if (load === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
+        <p className="animate-pulse text-sm text-muted">Wird geladen …</p>
       </Shell>
     );
   }
@@ -111,21 +111,21 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
   }
 
   return (
-    <div className="flex h-[100dvh] flex-col bg-black font-sans">
-      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-50">
+    <div className="flex h-[100dvh] flex-col bg-background font-sans">
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-4 py-3 text-foreground">
         <h1 className="truncate text-lg font-semibold tracking-tight">
           {team?.name ?? 'Dein Team'}
         </h1>
         <div className="flex shrink-0 items-center gap-4 text-sm">
-          <span className="tabular-nums text-zinc-300">{countdownLabel(board, now)}</span>
-          <span className="text-zinc-400">
-            Gefunden <span className="font-semibold text-zinc-100">{team?.foundAgents.length ?? 0}</span>
+          <span className="tabular-nums text-muted">{countdownLabel(board, now)}</span>
+          <span className="text-muted">
+            Gefunden <span className="font-semibold text-foreground">{team?.foundAgents.length ?? 0}</span>
           </span>
           <Link
             href="/leaderboard"
             aria-label="Rangliste"
             title="Rangliste"
-            className="text-zinc-400 transition-colors hover:text-zinc-100"
+            className="text-muted transition-colors hover:text-foreground"
           >
             <Trophy className="h-5 w-5" aria-hidden="true" />
           </Link>
@@ -156,13 +156,13 @@ function RetryError({ onRetry }: { onRetry: () => void }) {
   return (
     <Shell>
       <div className="flex flex-col items-center gap-4 px-6 text-center">
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-muted">
           Das Spielbrett konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
         </p>
         <button
           type="button"
           onClick={onRetry}
-          className="rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-800"
+          className="rounded-md border border-border-strong bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-raised"
         >
           Erneut versuchen
         </button>
@@ -174,7 +174,7 @@ function RetryError({ onRetry }: { onRetry: () => void }) {
 /** Centered full-screen shell for the loading/error states. */
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-[100dvh] items-center justify-center bg-black font-sans">
+    <div className="flex h-[100dvh] items-center justify-center bg-background font-sans">
       {children}
     </div>
   );

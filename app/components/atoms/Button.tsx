@@ -8,13 +8,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
+// Gaslight brass primary; calm raised secondary; tube-red danger (ADR 0031).
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300',
+  primary:
+    'bg-accent text-accent-contrast hover:bg-accent-hover disabled:opacity-50',
   secondary:
-    'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700',
-  danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
+    'bg-surface-raised text-foreground border border-border hover:bg-surface-overlay disabled:opacity-50',
+  danger: 'bg-danger text-white hover:bg-danger-hover disabled:opacity-50',
   ghost:
-    'bg-transparent text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800',
+    'bg-transparent text-muted hover:bg-surface-raised hover:text-foreground',
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -31,7 +33,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-md font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     />
   );

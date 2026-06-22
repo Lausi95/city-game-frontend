@@ -14,7 +14,7 @@ export default async function EditGamePage({
     <div className="mx-auto max-w-3xl px-6 py-8">
       <Link
         href={`/admin/games/${gameId}`}
-        className="mb-4 inline-block text-sm text-zinc-500 hover:text-zinc-700"
+        className="mb-4 inline-block text-sm text-muted hover:text-foreground"
       >
         ← {game.title}
       </Link>

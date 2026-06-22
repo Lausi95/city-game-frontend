@@ -31,8 +31,8 @@ export default function LeaderboardPage() {
 
   if (identity === 'loading') {
     return (
-      <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
+      <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-background font-sans">
+        <p className="animate-pulse text-sm text-muted">Wird geladen …</p>
       </div>
     );
   }
@@ -50,18 +50,18 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-zinc-50 font-sans dark:bg-black">
+    <div className="min-h-[calc(100vh-65px)] bg-background font-sans">
       <div className="mx-auto max-w-2xl px-4 py-6">
         <Link
           href="/"
-          className="mb-3 inline-block text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+          className="mb-3 inline-block text-sm text-muted transition-colors hover:text-foreground"
         >
           ← Spielbrett
         </Link>
-        <h1 className="mb-4 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="mb-4 text-2xl font-semibold tracking-tight text-foreground">
           Rangliste
         </h1>
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="overflow-hidden rounded-lg border border-border bg-surface">
           <Leaderboard gameId={identity.gameId} highlightTeamId={identity.teamId} />
         </div>
       </div>

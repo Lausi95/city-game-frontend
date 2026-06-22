@@ -63,14 +63,14 @@ export default function SetupQrDialog({ kind, src, printName, onClose }: SetupQr
         onClose={onClose}
       >
         <div className="flex flex-col items-center gap-4">
-          <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">{copy.guidance}</p>
+          <p className="text-center text-sm text-muted">{copy.guidance}</p>
 
           <div
             className="flex items-center justify-center rounded-lg bg-white p-4"
             style={{ width: QR_SIZE + 32, height: QR_SIZE + 32 }}
           >
             {errored ? (
-              <p className="px-2 text-center text-sm text-zinc-500">
+              <p className="px-2 text-center text-sm text-muted">
                 Der QR-Code konnte nicht geladen werden. Prüfe deine Verbindung und versuche es
                 erneut.
               </p>

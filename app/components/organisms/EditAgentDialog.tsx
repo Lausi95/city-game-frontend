@@ -154,7 +154,7 @@ export default function EditAgentDialog({
               <option value="UTILITY">Hilfsagent</option>
             </Select>
             {!canEditType && (
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-muted">
                 Der Typ ist gesperrt, sobald das Spiel begonnen hat.
               </p>
             )}
@@ -166,16 +166,16 @@ export default function EditAgentDialog({
                 type="checkbox"
                 checked={active}
                 onChange={(e) => setActive(e.target.checked)}
-                className="h-4 w-4 rounded border-zinc-300"
+                className="h-4 w-4 rounded border-border-strong"
               />
-              <label htmlFor="active" className="text-sm text-zinc-600">
+              <label htmlFor="active" className="text-sm text-muted">
                 Aktiv
               </label>
             </div>
           </FormField>
         </div>
 
-        {error && <p className="text-xs text-red-600">{error}</p>}
+        {error && <p className="text-xs text-danger">{error}</p>}
 
         <div className="flex justify-end gap-2">
           <Button

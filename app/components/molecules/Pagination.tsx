@@ -26,7 +26,7 @@ export function Pagination({ page, totalPages, onPrev, onNext }: PaginationProps
       >
         Zurück
       </Button>
-      <span className="text-sm text-zinc-500">
+      <span className="text-sm text-muted">
         Seite {page + 1} von {totalPages}
       </span>
       <Button

@@ -132,7 +132,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
           {showForm ? 'Abbrechen' : 'Agent hinzufügen'}
         </Button>
       </div>
-      <p className="mb-4 text-xs text-zinc-500">
+      <p className="mb-4 text-xs text-muted">
         QR-Code scannen, um ein Gerät diesem Agenten zuzuweisen. Da jeder Agent einzigartig ist und
         sich ohnehin bei der Spielleitung meldet, am besten direkt vom Bildschirm scannen.
       </p>
@@ -140,7 +140,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="mb-4 flex flex-col gap-3 rounded-lg border border-zinc-200 p-4"
+          className="mb-4 flex flex-col gap-3 rounded-lg border border-border p-4"
         >
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Vorname" htmlFor="firstName" required>
@@ -198,15 +198,15 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                   type="checkbox"
                   checked={form.active}
                   onChange={(e) => set('active', e.target.checked)}
-                  className="h-4 w-4 rounded border-zinc-300"
+                  className="h-4 w-4 rounded border-border-strong"
                 />
-                <label htmlFor="active" className="text-sm text-zinc-600">
+                <label htmlFor="active" className="text-sm text-muted">
                   Aktiv
                 </label>
               </div>
             </FormField>
           </div>
-          {error && <p className="text-xs text-red-600">{error}</p>}
+          {error && <p className="text-xs text-danger">{error}</p>}
           <div className="flex justify-end">
             <Button type="submit" disabled={loading} size="sm">
               {loading ? 'Wird erstellt …' : 'Agent erstellen'}
@@ -225,21 +225,21 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
       )}
 
       {agents.length === 0 ? (
-        <p className="text-sm text-zinc-500">Noch keine Agenten.</p>
+        <p className="text-sm text-muted">Noch keine Agenten.</p>
       ) : (
-        <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
+        <div className="divide-y divide-border rounded-lg border border-border">
           {visibleAgents.map((agent) => (
             <div key={agent.id} className="flex items-center justify-between px-3 py-2.5">
               <div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium">{agent.alias}</p>
-                  <Badge color={agent.type === 'MISTERX' ? 'red' : 'blue'}>
+                  <Badge color={agent.type === 'MISTERX' ? 'misterx' : 'utility'}>
                     {agent.type === 'MISTERX' ? 'Mister X' : 'Hilfsagent'}
                   </Badge>
-                  {!agent.active && <Badge color="zinc">Inaktiv</Badge>}
+                  {!agent.active && <Badge color="neutral">Inaktiv</Badge>}
                   <LastSeenIndicator location={agent.location} now={now} />
                 </div>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted">
                   {agent.firstName} {agent.lastName} · {agent.phoneNumber}
                 </p>
               </div>
@@ -250,7 +250,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                     size="sm"
                     onClick={() => setAgentToEdit(agent)}
                     aria-label={`Agent ${agent.alias} bearbeiten`}
-                    className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    className="text-muted hover:text-foreground"
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
@@ -271,7 +271,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                     size="sm"
                     onClick={() => setAgentToDelete(agent)}
                     aria-label={`Agent ${agent.alias} löschen`}
-                    className="text-zinc-400 hover:text-red-600"
+                    className="text-muted hover:text-danger"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>

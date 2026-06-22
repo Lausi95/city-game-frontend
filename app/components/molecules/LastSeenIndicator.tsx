@@ -12,12 +12,13 @@ const RECENT_MS = 300_000; // ≤ 5 min → yellow
 
 type Bucket = 'fresh' | 'recent' | 'stale' | 'none' | 'pending';
 
+// Ordered freshness ramp — kept good→bad, re-skinned to the fog palette (ADR 0031).
 const dotClass: Record<Bucket, string> = {
-  fresh: 'text-green-500',
-  recent: 'text-yellow-500',
-  stale: 'text-red-500',
-  none: 'text-zinc-400',
-  pending: 'text-zinc-300 dark:text-zinc-600',
+  fresh: 'text-success',
+  recent: 'text-warning',
+  stale: 'text-danger',
+  none: 'text-faint',
+  pending: 'text-faint',
 };
 
 function bucketFor(ageMs: number): Bucket {
@@ -43,7 +44,7 @@ export function formatAge(ageMs: number): string {
 export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
   if (location === null) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted">
         <Circle className={`h-2 w-2 fill-current ${dotClass.none}`} aria-hidden="true" />
         <span>kein Standort</span>
       </span>
@@ -54,7 +55,7 @@ export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
   // and first client render agree (no hydration mismatch).
   if (now <= 0) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted">
         <Circle className={`h-2 w-2 fill-current ${dotClass.pending}`} aria-hidden="true" />
         <span>…</span>
       </span>
@@ -67,7 +68,7 @@ export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 text-xs text-zinc-500"
+      className="inline-flex items-center gap-1.5 text-xs text-muted"
       aria-label={`Zuletzt gesehen ${label}`}
     >
       <Circle className={`h-2 w-2 fill-current ${dotClass[bucket]}`} aria-hidden="true" />

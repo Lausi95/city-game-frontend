@@ -37,7 +37,7 @@ export default function FindQrDialog({ gameId, agentId, onClose }: FindQrDialogP
       onClose={onClose}
     >
       <div className="flex flex-col items-center gap-4">
-        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-center text-sm text-muted">
           Zeig das einem Team, damit es ihn scannen und seinen Fund erfassen kann.
         </p>
 
@@ -46,7 +46,7 @@ export default function FindQrDialog({ gameId, agentId, onClose }: FindQrDialogP
           style={{ width: QR_SIZE + 32, height: QR_SIZE + 32 }}
         >
           {errored ? (
-            <p className="px-2 text-center text-sm text-zinc-500">
+            <p className="px-2 text-center text-sm text-muted">
               Dein QR-Code konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
             </p>
           ) : (

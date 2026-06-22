@@ -13,11 +13,11 @@ interface StatTileProps {
  */
 export function StatTile({ label, children }: StatTileProps) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800">
-      <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+    <div className="flex flex-col gap-1 rounded-lg border border-border bg-surface-raised p-3">
+      <span className="font-display text-xs uppercase tracking-wide text-faint">
         {label}
       </span>
-      <div className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+      <div className="text-sm font-medium text-foreground">
         {children}
       </div>
     </div>

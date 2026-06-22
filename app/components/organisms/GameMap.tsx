@@ -3,6 +3,7 @@
 import { MapContainer, TileLayer, CircleMarker, Polyline, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { formatAge } from '@/app/components/molecules/LastSeenIndicator';
+import { mapColor, TILE_URL, TILE_ATTRIBUTION } from '@/app/lib/mapTheme';
 import type { AgentResource, MapResource } from '@/app/types/api';
 
 interface GameMapProps {
@@ -14,10 +15,10 @@ interface GameMapProps {
   className?: string;
 }
 
-// Agent marker fill by type — matches the Badge colors in AgentsSection.
+// Agent marker fill by type — matches the Badge colors in AgentsSection (ADR 0031).
 const AGENT_FILL: Record<AgentResource['type'], string> = {
-  MISTERX: '#dc2626', // red
-  UTILITY: '#2563eb', // blue
+  MISTERX: mapColor('--color-misterx'), // brass
+  UTILITY: mapColor('--color-utility'), // fog-blue
 };
 
 function GridOverlay({ map }: { map: MapResource }) {
@@ -49,21 +50,24 @@ function GridOverlay({ map }: { map: MapResource }) {
     vLines.push([[minLat, lng], [maxLat, lng]]);
   }
 
+  const outline = mapColor('--color-utility');
+  const gridLine = mapColor('--color-grid');
+
   return (
     <>
-      <Polyline positions={border} pathOptions={{ color: '#2563eb', weight: 2 }} />
+      <Polyline positions={border} pathOptions={{ color: outline, weight: 2 }} />
       {hLines.map((line, i) => (
         <Polyline
           key={`h${i}`}
           positions={line}
-          pathOptions={{ color: '#2563eb', weight: 1, opacity: 0.5 }}
+          pathOptions={{ color: gridLine, weight: 1, opacity: 0.6 }}
         />
       ))}
       {vLines.map((line, j) => (
         <Polyline
           key={`v${j}`}
           positions={line}
-          pathOptions={{ color: '#2563eb', weight: 1, opacity: 0.5 }}
+          pathOptions={{ color: gridLine, weight: 1, opacity: 0.6 }}
         />
       ))}
     </>
@@ -95,7 +99,7 @@ function AgentMarkers({ agents, now }: { agents: AgentResource[]; now: number })
           >
             <Tooltip direction="top" offset={[0, -6]}>
               <span className="font-medium">{agent.alias}</span>
-              {age && <span className="ml-1 text-zinc-500">· {age}</span>}
+              {age && <span className="ml-1 text-muted">· {age}</span>}
             </Tooltip>
           </CircleMarker>
         );
@@ -119,22 +123,19 @@ export default function GameMap({ map, agents, now, className = 'h-80' }: GameMa
     <MapContainer
       bounds={bounds}
       boundsOptions={{ padding: [40, 40] }}
-      className={`${className} w-full rounded-md border border-zinc-200`}
+      className={`${className} w-full rounded-md border border-border`}
     >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; OpenStreetMap contributors"
-      />
-      {/* Corner markers use neutral slate so red is reserved for Mister X agents. */}
+      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+      {/* Corner markers use neutral fog tones so brass is reserved for Mister X agents. */}
       <CircleMarker
         center={[map.cornerA.latitude, map.cornerA.longitude]}
         radius={8}
-        pathOptions={{ color: '#334155', fillColor: '#334155', fillOpacity: 1 }}
+        pathOptions={{ color: mapColor('--color-faint'), fillColor: mapColor('--color-faint'), fillOpacity: 1 }}
       />
       <CircleMarker
         center={[map.cornerB.latitude, map.cornerB.longitude]}
         radius={8}
-        pathOptions={{ color: '#94a3b8', fillColor: '#94a3b8', fillOpacity: 1 }}
+        pathOptions={{ color: mapColor('--color-muted'), fillColor: mapColor('--color-muted'), fillOpacity: 1 }}
       />
       <GridOverlay map={map} />
       <AgentMarkers agents={agents} now={now} />

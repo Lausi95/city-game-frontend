@@ -68,12 +68,12 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
   if (confirming && selected) {
     return (
       <Modal title="Fund erfassen" onClose={() => !loading && onClose()}>
-        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mb-4 text-sm text-muted">
           Erfassen, dass <span className="font-medium">{team.name}</span>{' '}
           <span className="font-medium">{selected.alias}</span> gefunden hat? Das kann nicht
           rückgängig gemacht werden.
         </p>
-        {error && <p className="mb-4 text-xs text-red-600">{error}</p>}
+        {error && <p className="mb-4 text-xs text-danger">{error}</p>}
         <div className="flex justify-end gap-2">
           <Button
             type="button"
@@ -96,7 +96,7 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
     <Modal title={`Fund erfassen — ${team.name}`} onClose={onClose}>
       {findable.length === 0 ? (
         <>
-          <p className="mb-4 text-sm text-zinc-500">
+          <p className="mb-4 text-sm text-muted">
             Für dieses Team gibt es gerade keine Agenten zum Finden.
           </p>
           <div className="flex justify-end">
@@ -132,7 +132,7 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
             </Select>
           </FormField>
 
-          {error && <p className="text-xs text-red-600">{error}</p>}
+          {error && <p className="text-xs text-danger">{error}</p>}
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>

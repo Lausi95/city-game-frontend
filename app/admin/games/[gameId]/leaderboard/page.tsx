@@ -17,12 +17,12 @@ export default async function GameLeaderboardPage({
     <div className="mx-auto max-w-2xl px-6 py-8">
       <Link
         href={`/admin/games/${gameId}`}
-        className="mb-1 inline-block text-sm text-zinc-500 hover:text-zinc-700"
+        className="mb-1 inline-block text-sm text-muted hover:text-foreground"
       >
         ← {game.title}
       </Link>
       <h1 className="mb-4 text-2xl font-semibold">Rangliste</h1>
-      <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="overflow-hidden rounded-lg border border-border bg-background">
         <Leaderboard gameId={gameId} />
       </div>
     </div>
