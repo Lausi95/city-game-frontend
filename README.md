@@ -29,8 +29,20 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This app is deployed as a Docker container on a dedicated server, fronted by
+traefik (TLS + routing). See
+[docs/adr/0018](docs/adr/0018-containerized-deployment-behind-traefik.md) for the
+rationale and the load-bearing constraints.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployment is automated: pushing to `main` runs `.github/workflows/deploy.yml`,
+which builds and pushes the image to GHCR, then runs the Ansible playbook in
+`ansible/` over SSH. The playbook renders `docker-compose.yml` and `.env.production`
+(secrets from the encrypted `ansible/vault.yml` — see `ansible/vault.yml.example`)
+onto the server and runs `docker compose pull && up -d`.
+
+The `Dockerfile` builds a Next.js standalone image; the compose template joins the
+shared external `traefik` network and carries the router/TLS labels. The container
+publishes **no host ports** — it is reachable only through traefik, which is what
+makes the forwarded-host tenant resolution (ADR 0017) safe.

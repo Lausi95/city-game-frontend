@@ -1,0 +1,24 @@
+# Template for ansible/vault.yml — the ENCRYPTED secrets file the deploy reads.
+# These values are rendered into .env.production on the server (see
+# templates/env.production.j2). Only genuine secrets live here; non-secret config
+# (AUTH_KEYCLOAK_ISSUER, API_URL) are plain vars in deploy-prod.yml.
+#
+# Create the real, encrypted file (committed encrypted — that is the point of vault):
+#
+#   1. Generate the AUTH_SECRET value:
+#        openssl rand -base64 32
+#   2. Create + encrypt the vars file (uses the same vault password the CI holds
+#      in the ANSIBLE_VAULT_PASSWORD secret):
+#        cd ansible
+#        ansible-vault create vault.yml
+#      ...and put the lines below inside, with your real values.
+#   3. Commit ansible/vault.yml (it is encrypted ciphertext, safe to commit).
+#
+# To rotate later: `ansible-vault edit vault.yml`, then redeploy.
+
+# Keycloak confidential-client credentials (from the Keycloak admin console).
+auth_keycloak_id: "city-game-admin"
+auth_keycloak_secret: "<paste keycloak client secret>"
+
+# NextAuth signing secret — `openssl rand -base64 32`.
+auth_secret: "<paste generated value>"

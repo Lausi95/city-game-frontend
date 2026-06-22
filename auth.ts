@@ -57,6 +57,14 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 }
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  // One container serves many tenant domains behind traefik, so the OAuth
+  // callback URL must be derived per-request from the forwarded host rather
+  // than pinned to a single AUTH_URL. trustHost lets NextAuth read the host
+  // from traefik's X-Forwarded-Host; production therefore leaves AUTH_URL
+  // unset. Safe only because the container is reachable solely via traefik,
+  // which overwrites client-supplied forwarded headers.
+  // See docs/adr/0018-containerized-deployment-behind-traefik.md.
+  trustHost: true,
   providers: [Keycloak],
   pages: {
     signIn: "/auth/signin",

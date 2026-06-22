@@ -1,0 +1,51 @@
+---
+- name: Deploy
+  hosts: all
+  vars_files:
+    # Vault-encrypted: defines the frontend's secret env (Keycloak client +
+    # AUTH_SECRET). See ansible/vault.yml.example.
+    - vault.yml
+  vars:
+    directory: ~/city-game-frontend
+    docker_username: "{{ lookup('env', 'DOCKER_USERNAME') }}"
+    docker_password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
+    # Non-secret runtime config (safe to keep in clear text). Set to the real
+    # production values — these are placeholders.
+    auth_keycloak_issuer: "https://auth.lausi95.net/realms/city-game"
+    api_url: "https://api.city-game.lausi95.net"
+  tasks:
+    - name: application directory
+      file:
+        path: "{{ directory }}"
+        state: directory
+
+    - name: render compose file
+      template:
+        src: "templates/docker-compose.yml.j2"
+        dest: "{{ directory }}/docker-compose.yml"
+        mode: "0640"
+
+    - name: render runtime env file (injects secrets from vault)
+      template:
+        src: "templates/env.production.j2"
+        dest: "{{ directory }}/.env.production"
+        mode: "0600"
+
+    - name: Login to Docker registry
+      shell: echo "{{ docker_password }}" | docker login ghcr.io -u "{{ docker_username }}" --password-stdin
+      no_log: true
+
+    - name: pull images
+      shell:
+        chdir: "{{ directory }}"
+        cmd: docker compose pull
+
+    - name: start images
+      shell:
+        chdir: "{{ directory }}"
+        cmd: docker compose up -d --remove-orphans
+
+    - name: cleanup unused images
+      shell:
+        chdir: "{{ directory }}"
+        cmd: docker image prune -f

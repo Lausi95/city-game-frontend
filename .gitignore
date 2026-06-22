@@ -32,6 +32,12 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the production template carries no secrets and must be committed.
+!.env.production.example
+
+# ansible: plaintext vault password written by CI — must never be committed.
+# (ansible/vault.yml itself IS committed — it is encrypted ciphertext.)
+ansible/vault_password*
 
 # vercel
 .vercel

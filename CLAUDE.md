@@ -20,11 +20,27 @@ Copy `.env.local` with these required variables:
 AUTH_KEYCLOAK_ID=
 AUTH_KEYCLOAK_SECRET=
 AUTH_KEYCLOAK_ISSUER=    # e.g. https://auth.example.com/realms/city-game
-AUTH_URL=                # e.g. http://localhost:3000
+AUTH_URL=                # dev only — e.g. http://localhost:3000; unset in prod (see Deployment)
 AUTH_SECRET=
 API_URL=                 # backend base URL; defaults to http://localhost:8080
 TENANT_OVERRIDE=         # local dev only: tenant to resolve against (see Tenant resolution)
 ```
+
+## Deployment
+
+Production runs as a Docker container (`Dockerfile`, Next.js standalone output)
+on a dedicated server behind traefik (`docker-compose.yml`, shared external
+`traefik` network, TLS via Let's Encrypt). Runtime config comes from
+`.env.production` on the server (template: `.env.production.example`); secrets are
+never baked into the image. See `docs/adr/0018-containerized-deployment-behind-traefik.md`.
+
+Two production-specific contracts to respect:
+- **`AUTH_URL` is unset in prod**; `auth.ts` sets `trustHost: true` so the OAuth
+  callback URL is derived per-request from the traefik-forwarded host (one
+  container serves many tenant domains). Don't re-pin `AUTH_URL`.
+- **The container publishes no host ports** — reachable only via traefik. This is
+  the security boundary that makes the forwarded-host tenant resolution (ADR 0017)
+  safe; a published port would allow tenant spoofing.
 
 ## Architecture
 

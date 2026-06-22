@@ -1,0 +1,45 @@
+# Rendered by Ansible (deploy-prod.yml) to ~/city-game-frontend/docker-compose.yml
+# on a single dedicated server where traefik (its own stack) provides TLS
+# termination and routing on a shared docker network.
+# See docs/adr/0018-containerized-deployment-behind-traefik.md.
+#
+# SECURITY INVARIANT: this service publishes NO host ports. It is reachable only
+# through traefik on the shared network. tenant.ts derives the tenant from the
+# X-Forwarded-Host header (ADR 0017); traefik overwrites client-supplied
+# forwarded headers, so routing through it is what makes that trust safe. A
+# published port would let a client reach the container directly and spoof the
+# tenant — do not add a `ports:` block.
+
+services:
+  city-game-frontend:
+    # Prebuilt by CI and pulled from the registry — the server has no source tree.
+    image: ghcr.io/lausi95/city-game/city-game-frontend:latest
+    restart: unless-stopped
+    # Runtime config is rendered next to this file by Ansible from the vault
+    # (see templates/env.production.j2). AUTH_URL is deliberately omitted —
+    # trustHost derives the callback URL from the forwarded host (ADR 0018).
+    env_file:
+      - .env.production
+    networks:
+      - traefik
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+
+      # --- HTTPS router (one container, multiple tenant domains) ---
+      - "traefik.http.routers.city-game-admin.rule=Host(`demo.city-game.lausi95.net`) || Host(`go7.city-game.lausi95.net`)"
+      - "traefik.http.routers.city-game-admin.entrypoints=websecure"
+      - "traefik.http.routers.city-game-admin.tls=true"
+      - "traefik.http.routers.city-game-admin.tls.certresolver=letsencrypt"
+
+networks:
+  # The traefik stack owns this network; create it once with
+  #   docker network create traefik
+  traefik:
+    external: true
