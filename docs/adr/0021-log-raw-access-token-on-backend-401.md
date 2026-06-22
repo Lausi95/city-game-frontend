@@ -1,8 +1,17 @@
 ---
-status: accepted (amends 0020-structured-json-logging-with-pino-for-datadog)
+status: superseded by 0022-secure-cookie-from-request-protocol-not-auth-url
 ---
 
 # Log the raw operator access token on backend 401
+
+> **Superseded.** This instrumentation was added to diagnose a production "access
+> token not present" symptom, but it sat on the **backend-returned** 401 path —
+> which the actual bug never reached (the failure short-circuited at the
+> synthetic no-token 401, `authedFetch` returning before any backend call). It
+> therefore never emitted anything useful, while still stripping the
+> `accessToken`/`token` redact backstop and risking raw tokens in Datadog. The
+> root cause is fixed in [ADR 0022](0022-secure-cookie-from-request-protocol-not-auth-url.md),
+> which reverts this change. Retained for history.
 
 When a backend call returns `401`, `authedFetch` logs the **raw operator
 Keycloak access token** so it can be inspected directly (e.g. pasted into a JWT

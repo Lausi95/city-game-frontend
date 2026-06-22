@@ -1,13 +1,17 @@
 import { cookies } from 'next/headers';
 import { getToken } from 'next-auth/jwt';
 import { tenantHeaders } from './tenant';
-import { logBackendError } from './logger';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
-// Auth.js uses the secure-prefixed cookie name when the deployment URL is https.
-// getToken must look for the same name, so derive it from AUTH_URL.
-const secureCookie = (process.env.AUTH_URL ?? '').startsWith('https://');
+// Auth.js prefixes the session cookie with `__Secure-` exactly when it was set
+// over https — `@auth/core` derives that from the request protocol, NOT from
+// AUTH_URL (unset in prod, see auth.ts / ADR 0019). getToken must read with the
+// same name or it finds no token. The deployment contract pins protocol to
+// environment: prod is always https behind traefik, dev is plain http — which
+// is precisely what NODE_ENV encodes, so it matches the write path in both.
+// See docs/adr/0022-secure-cookie-from-request-protocol-not-auth-url.md.
+const secureCookie = process.env.NODE_ENV === 'production';
 
 /**
  * Server-only fetch for the backend's authenticated surface (`/games/**`).
@@ -47,15 +51,5 @@ export async function authedFetch(path: string, init: RequestInit = {}): Promise
     headers.set(key, value);
   }
 
-  const res = await fetch(`${API_URL}${path}`, { ...init, headers });
-
-  // Per ADR 0021: when the backend rejects the token, log it raw on the
-  // "backend call failed" line so the operator can inspect/replay it.
-  // Deliberately reverses the "never log secrets" rule of ADR 0020 — the
-  // `accessToken` redact entry is removed from logger.ts so it emits verbatim.
-  if (res.status === 401) {
-    logBackendError('authedFetch', { status: res.status, path, accessToken });
-  }
-
-  return res;
+  return fetch(`${API_URL}${path}`, { ...init, headers });
 }
