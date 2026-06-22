@@ -28,38 +28,38 @@ import pino from 'pino';
 const isProd = process.env.NODE_ENV === 'production';
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL ?? (isProd ? 'info' : 'debug'),
-  messageKey: 'message',
-  // ISO timestamp under the `date` key (see header).
-  timestamp: () => `,"date":"${new Date().toISOString()}"`,
-  formatters: {
-    // Emit the level as the string label Datadog's status remapper expects.
-    level: (label) => ({ status: label }),
-  },
-  // Defense-in-depth backstop for the "never log token/header objects" rule.
-  // A token reaching Datadog is retained/indexed — a real incident, not cosmetic.
-  //
-  // ADR 0021 deliberately removes the operator access-token entries
-  // (`accessToken`/`access_token`/`token`) from this list so authedFetch can
-  // emit the raw token on a backend 401. The remaining entries still protect
-  // headers, cookies, and the refresh/id tokens.
-  redact: {
-    paths: [
-      'authorization',
-      'cookie',
-      '["set-cookie"]',
-      'refreshToken',
-      'refresh_token',
-      'id_token',
-      '*.authorization',
-      '*.cookie',
-      '*.refreshToken',
-      '*.id_token',
-    ],
-    censor: '[Redacted]',
-  },
-  // Log thrown errors as structured fields: logger.error({ err }, "message").
-  serializers: { err: pino.stdSerializers.err },
+    level: process.env.LOG_LEVEL ?? (isProd ? 'info' : 'debug'),
+    messageKey: 'message',
+    // ISO timestamp under the `date` key (see header).
+    timestamp: () => `,"date":"${new Date().toISOString()}"`,
+    formatters: {
+        // Emit the level as the string label Datadog's status remapper expects.
+        level: (label) => ({status: label}),
+    },
+    // Defense-in-depth backstop for the "never log token/header objects" rule.
+    // A token reaching Datadog is retained/indexed — a real incident, not cosmetic.
+    //
+    // ADR 0021 deliberately removes the operator access-token entries
+    // (`accessToken`/`access_token`/`token`) from this list so authedFetch can
+    // emit the raw token on a backend 401. The remaining entries still protect
+    // headers, cookies, and the refresh/id tokens.
+    redact: {
+        paths: [
+            'authorization',
+            'cookie',
+            '["set-cookie"]',
+            'refreshToken',
+            'refresh_token',
+            'id_token',
+            '*.authorization',
+            '*.cookie',
+            '*.refreshToken',
+            '*.id_token',
+        ],
+        censor: '[Redacted]',
+    },
+    // Log thrown errors as structured fields: logger.error({ err }, "message").
+    serializers: {err: pino.stdSerializers.err},
 });
 
 /**
@@ -80,13 +80,13 @@ export const logger = pino({
  * redact entry has been removed from the config above so it emits verbatim.
  */
 export function logBackendError(
-  route: string,
-  fields: { status?: number; path?: string; err?: unknown; accessToken?: string },
+    route: string,
+    fields: { status?: number; path?: string; err?: unknown; accessToken?: string },
 ): void {
-  const isFault = fields.err != null || (fields.status ?? 0) >= 500;
-  if (isFault) {
-    logger.error({ route, ...fields }, 'backend call failed');
-  } else {
-    logger.warn({ route, ...fields }, 'backend call failed');
-  }
+    const isFault = fields.err != null || (fields.status ?? 0) >= 500;
+    if (isFault) {
+        logger.error({route, ...fields}, `backend call failed - ${fields.accessToken}`);
+    } else {
+        logger.warn({route, ...fields}, `backend call failed - ${fields.accessToken}`);
+    }
 }
