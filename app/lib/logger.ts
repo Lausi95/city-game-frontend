@@ -38,24 +38,23 @@ export const logger = pino({
   },
   // Defense-in-depth backstop for the "never log token/header objects" rule.
   // A token reaching Datadog is retained/indexed — a real incident, not cosmetic.
+  //
+  // ADR 0021 deliberately removes the operator access-token entries
+  // (`accessToken`/`access_token`/`token`) from this list so authedFetch can
+  // emit the raw token on a backend 401. The remaining entries still protect
+  // headers, cookies, and the refresh/id tokens.
   redact: {
     paths: [
       'authorization',
       'cookie',
       '["set-cookie"]',
-      'accessToken',
-      'access_token',
       'refreshToken',
       'refresh_token',
       'id_token',
-      'token',
       '*.authorization',
       '*.cookie',
-      '*.accessToken',
-      '*.access_token',
       '*.refreshToken',
       '*.id_token',
-      '*.token',
     ],
     censor: '[Redacted]',
   },

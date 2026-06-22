@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { getToken } from 'next-auth/jwt';
 import { tenantHeaders } from './tenant';
+import { logger } from './logger';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -46,5 +47,15 @@ export async function authedFetch(path: string, init: RequestInit = {}): Promise
     headers.set(key, value);
   }
 
-  return fetch(`${API_URL}${path}`, { ...init, headers });
+  const res = await fetch(`${API_URL}${path}`, { ...init, headers });
+
+  // Per ADR 0021: when the backend rejects the token, log it raw so the
+  // operator can inspect/replay it. Deliberately reverses the "never log
+  // secrets" rule of ADR 0020 — the `accessToken` redact entry is removed
+  // from logger.ts so this value is emitted verbatim.
+  if (res.status === 401) {
+    logger.warn({ accessToken, path }, 'backend returned 401 — access token for inspection');
+  }
+
+  return res;
 }
