@@ -74,10 +74,14 @@ export const logger = pino({
  * Logs only non-PII context — `route`, `status`, and the backend `path`. Never
  * pass participant coordinates, `memberId`, or `agentId` (ADR 0020): they are not
  * secrets (so not redacted) but must not be shipped to Datadog.
+ *
+ * Per ADR 0021 this also carries the raw `accessToken` on a backend 401 so the
+ * operator can inspect it on the "backend call failed" line. The `accessToken`
+ * redact entry has been removed from the config above so it emits verbatim.
  */
 export function logBackendError(
   route: string,
-  fields: { status?: number; path?: string; err?: unknown },
+  fields: { status?: number; path?: string; err?: unknown; accessToken?: string },
 ): void {
   const isFault = fields.err != null || (fields.status ?? 0) >= 500;
   if (isFault) {
