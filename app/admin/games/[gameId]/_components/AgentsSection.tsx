@@ -10,6 +10,7 @@ import { FormField } from '@/app/components/molecules/FormField';
 import { Badge } from '@/app/components/atoms/Badge';
 import { LastSeenIndicator } from '@/app/components/molecules/LastSeenIndicator';
 import EditAgentDialog from '@/app/components/organisms/EditAgentDialog';
+import SetupQrDialog from '@/app/components/organisms/SetupQrDialog';
 import { useAgents } from './AgentsProvider';
 import type { AgentResource } from '@/app/types/api';
 
@@ -36,6 +37,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
   const [error, setError] = useState<string | null>(null);
 
   const [agentToEdit, setAgentToEdit] = useState<AgentResource | null>(null);
+  const [agentToShowQr, setAgentToShowQr] = useState<AgentResource | null>(null);
 
   // Live agent state + wall-clock are owned by AgentsProvider so the list and
   // the map share one polled source. See docs/adr/0003 and docs/adr/0006.
@@ -73,7 +75,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-1 flex items-center justify-between">
         <h2 className="text-lg font-medium">Agenten</h2>
         <Button
           variant="secondary"
@@ -86,6 +88,10 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
           {showForm ? 'Abbrechen' : 'Agent hinzufügen'}
         </Button>
       </div>
+      <p className="mb-4 text-xs text-zinc-500">
+        QR-Code scannen, um ein Gerät diesem Agenten zuzuweisen. Da jeder Agent einzigartig ist und
+        sich ohnehin bei der Spielleitung meldet, am besten direkt vom Bildschirm scannen.
+      </p>
 
       {showForm && (
         <form
@@ -194,16 +200,14 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                 >
                   <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>
-                <a
-                  href={`/api/admin/games/${gameId}/agents/${agent.id}/setup-qr`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setAgentToShowQr(agent)}
                   aria-label={`Setup-QR für Agent ${agent.alias} öffnen`}
                 >
-                  <Button variant="ghost" size="sm">
-                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Button>
-                </a>
+                  <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
+                </Button>
               </div>
             </div>
           ))}
@@ -216,6 +220,15 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
           agent={agentToEdit}
           canEditType={canEditType}
           onClose={() => setAgentToEdit(null)}
+        />
+      )}
+
+      {agentToShowQr && (
+        <SetupQrDialog
+          kind="agent"
+          src={`/api/admin/games/${gameId}/agents/${agentToShowQr.id}/setup-qr`}
+          printName={agentToShowQr.alias}
+          onClose={() => setAgentToShowQr(null)}
         />
       )}
     </div>

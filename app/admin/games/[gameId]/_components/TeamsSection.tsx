@@ -8,6 +8,7 @@ import { Input } from '@/app/components/atoms/Input';
 import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
 import EditTeamDialog from '@/app/components/organisms/EditTeamDialog';
 import RecordFindDialog from '@/app/components/organisms/RecordFindDialog';
+import SetupQrDialog from '@/app/components/organisms/SetupQrDialog';
 import type { TeamResource } from '@/app/types/api';
 import { useAgents } from './AgentsProvider';
 
@@ -25,6 +26,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
 
   const [teamToEdit, setTeamToEdit] = useState<TeamResource | null>(null);
   const [teamToRecordFind, setTeamToRecordFind] = useState<TeamResource | null>(null);
+  const [teamToShowQr, setTeamToShowQr] = useState<TeamResource | null>(null);
   const [teamToDelete, setTeamToDelete] = useState<TeamResource | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -81,7 +83,11 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
 
   return (
     <div>
-      <h2 className="mb-4 text-lg font-medium">Teams</h2>
+      <h2 className="mb-1 text-lg font-medium">Teams</h2>
+      <p className="mb-4 text-xs text-zinc-500">
+        QR-Code scannen, um ein Gerät diesem Team zuzuweisen. Am besten ausdrucken, damit
+        Teammitglieder ihre Geräte selbst einrichten können.
+      </p>
 
       <form onSubmit={handleCreate} className="mb-4 flex gap-2">
         <Input
@@ -129,16 +135,14 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                 >
                   <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>
-                <a
-                  href={`/api/admin/games/${gameId}/teams/${team.id}/setup-qr`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setTeamToShowQr(team)}
                   aria-label={`Setup-QR für Team ${team.name} öffnen`}
                 >
-                  <Button variant="ghost" size="sm">
-                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Button>
-                </a>
+                  <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -171,6 +175,15 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
           team={teamToRecordFind}
           agents={agents}
           onClose={() => setTeamToRecordFind(null)}
+        />
+      )}
+
+      {teamToShowQr && (
+        <SetupQrDialog
+          kind="team"
+          src={`/api/admin/games/${gameId}/teams/${teamToShowQr.id}/setup-qr`}
+          printName={teamToShowQr.name}
+          onClose={() => setTeamToShowQr(null)}
         />
       )}
 
