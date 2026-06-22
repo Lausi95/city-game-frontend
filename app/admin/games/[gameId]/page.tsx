@@ -4,6 +4,7 @@ import { Badge } from '@/app/components/atoms/Badge';
 import TeamsSection from './_components/TeamsSection';
 import AgentsSection from './_components/AgentsSection';
 import GameMapClient from './_components/GameMapClient';
+import GameDetailTabs from './_components/GameDetailTabs';
 import { AgentsProvider } from './_components/AgentsProvider';
 
 export default async function GameDetailPage({
@@ -24,7 +25,7 @@ export default async function GameDetailPage({
   const canEditType = new Date(game.startTime) > new Date();
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8">
+    <div className="mx-auto max-w-7xl px-6 py-8">
       <Link href="/admin" className="mb-1 inline-block text-sm text-zinc-500 hover:text-zinc-700">
         ← Spiele
       </Link>
@@ -56,20 +57,32 @@ export default async function GameDetailPage({
       </div>
 
       <AgentsProvider gameId={gameId} initial={agents.content}>
-        <section className="mb-8">
-          <div className="mb-2 flex items-baseline gap-3">
-            <h2 className="text-lg font-medium">Karte</h2>
-            <span className="text-xs text-zinc-500">
-              {map.grid.rows} Zeilen × {map.grid.columns} Spalten
-            </span>
-          </div>
-          <GameMapClient map={map} />
-        </section>
+        <GameDetailTabs
+          karte={
+            <div className="grid h-[calc(100vh-220px)] min-h-[32rem] grid-cols-[3fr_2fr] gap-8">
+              <section className="flex min-h-0 flex-col">
+                <div className="mb-2 flex items-baseline gap-3">
+                  <h2 className="text-lg font-medium">Karte</h2>
+                  <span className="text-xs text-zinc-500">
+                    {map.grid.rows} Zeilen × {map.grid.columns} Spalten
+                  </span>
+                </div>
+                <div className="min-h-0 flex-1">
+                  <GameMapClient map={map} className="h-full" />
+                </div>
+              </section>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <TeamsSection gameId={gameId} teams={teams.content} />
-          <AgentsSection gameId={gameId} canEditType={canEditType} />
-        </div>
+              <div className="min-h-0 overflow-y-auto pr-1">
+                <AgentsSection gameId={gameId} canEditType={canEditType} />
+              </div>
+            </div>
+          }
+          teams={
+            <div className="max-w-3xl">
+              <TeamsSection gameId={gameId} teams={teams.content} />
+            </div>
+          }
+        />
       </AgentsProvider>
     </div>
   );

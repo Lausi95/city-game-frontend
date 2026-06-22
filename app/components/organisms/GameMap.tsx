@@ -10,6 +10,8 @@ interface GameMapProps {
   agents: AgentResource[];
   /** Shared, ticking wall-clock (ms). 0 means "not yet mounted". */
   now: number;
+  /** Tailwind sizing override for the map container; defaults to `h-80`. */
+  className?: string;
 }
 
 // Agent marker fill by type — matches the Badge colors in AgentsSection.
@@ -102,7 +104,7 @@ function AgentMarkers({ agents, now }: { agents: AgentResource[]; now: number })
   );
 }
 
-export default function GameMap({ map, agents, now }: GameMapProps) {
+export default function GameMap({ map, agents, now, className = 'h-80' }: GameMapProps) {
   const minLat = Math.min(map.cornerA.latitude, map.cornerB.latitude);
   const maxLat = Math.max(map.cornerA.latitude, map.cornerB.latitude);
   const minLng = Math.min(map.cornerA.longitude, map.cornerB.longitude);
@@ -117,7 +119,7 @@ export default function GameMap({ map, agents, now }: GameMapProps) {
     <MapContainer
       bounds={bounds}
       boundsOptions={{ padding: [40, 40] }}
-      className="h-80 w-full rounded-md border border-zinc-200"
+      className={`${className} w-full rounded-md border border-zinc-200`}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

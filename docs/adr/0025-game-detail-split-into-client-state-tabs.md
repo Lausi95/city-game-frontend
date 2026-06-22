@@ -1,0 +1,12 @@
+# The game-detail page splits into client-state tabs, with inactive panels hidden — not unmounted
+
+The operator's game-detail page (`app/admin/games/[gameId]/page.tsx`) splits its body into two tabs: **"Karte & Agenten"** (a 60/40 map-left / agent-list-right split, the default tab) and **"Teams"** (the team list). The page header — title, count badges, and the Edit/Leaderboard actions — stays persistent above the tab bar. Tab selection is **client `useState`**, not a route, so switching tabs never re-hits the backend and never tears down the live `AgentsProvider` polling that both tabs sit inside.
+
+A reader might expect each tab to be a real route (`/admin/games/[gameId]` and `/.../teams`) under a shared `layout.tsx`, which would make tabs linkable and bookmarkable. We chose client state instead because the page already fetches `game`/`map`/`teams`/`agents` together in one `Promise.all` and wraps the whole body in `AgentsProvider`, which polls agent locations every 20s. Route-based tabs would fragment that provider and re-fetch on every switch; the operator is running one live game, so a bookmarkable tab is worth less than uninterrupted live state.
+
+The non-obvious part — and the reason this is written down — is that **both panels stay mounted and the inactive one is hidden with CSS (`hidden`), rather than conditionally rendered**. The Karte tab holds a Leaflet map (`GameMap`, loaded `ssr: false`). Conditionally rendering the inactive tab would unmount and re-init Leaflet on every switch back: lost zoom/pan and a re-fit-bounds flicker. Keeping it mounted preserves map state across switches. This is safe **only because Karte is the default-visible tab**, so the map initialises at its correct container size; a Leaflet map that first mounts while hidden computes a zero size and renders gray until an `invalidateSize()`. If the default tab ever changes, that guarantee breaks and the map will need an explicit `invalidateSize()` on reveal.
+
+Consequences:
+- Tab choice is not linkable and resets to "Karte & Agenten" on refresh — accepted, since the admin panel is operated live, not deep-linked.
+- The tab bar is a reusable `Tabs` molecule (`app/components/molecules/Tabs.tsx`) rendering only the bar; the page owns the active-state and both panels.
+- The admin panel is **desktop-only** — the Karte tab stays a fixed 60/40 two-column split with a tall fixed-height map and an internally-scrolling agent list; it does not stack on narrow viewports.
