@@ -31,14 +31,14 @@ export default function FindQrDialog({ gameId, agentId, onClose }: FindQrDialogP
       title={
         <span className="inline-flex items-center gap-2">
           <QrCode className="h-4 w-4" aria-hidden="true" />
-          Find QR
+          Fund-QR
         </span>
       }
       onClose={onClose}
     >
       <div className="flex flex-col items-center gap-4">
         <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-          Show this to a team so they can scan it and record their find.
+          Zeig das einem Team, damit es ihn scannen und seinen Fund erfassen kann.
         </p>
 
         <div
@@ -47,12 +47,12 @@ export default function FindQrDialog({ gameId, agentId, onClose }: FindQrDialogP
         >
           {errored ? (
             <p className="px-2 text-center text-sm text-zinc-500">
-              Couldn&apos;t load your QR code. Check your connection and try again.
+              Dein QR-Code konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
             </p>
           ) : (
             <Image
               src={src}
-              alt="Your find QR code"
+              alt="Dein Fund-QR-Code"
               width={QR_SIZE}
               height={QR_SIZE}
               unoptimized

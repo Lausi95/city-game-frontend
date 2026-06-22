@@ -43,13 +43,13 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? 'Failed to create team');
+        throw new Error(err.detail ?? 'Team konnte nicht erstellt werden');
       }
 
       setName('');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
     } finally {
       setLoading(false);
     }
@@ -67,13 +67,13 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? 'Failed to delete team');
+        throw new Error(err.detail ?? 'Team konnte nicht gelöscht werden');
       }
 
       setTeamToDelete(null);
       router.refresh();
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Something went wrong');
+      setDeleteError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
     } finally {
       setDeleteLoading(false);
     }
@@ -85,20 +85,20 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
 
       <form onSubmit={handleCreate} className="mb-4 flex gap-2">
         <Input
-          placeholder="Team name"
+          placeholder="Teamname"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
         <Button type="submit" disabled={loading} size="sm" className="shrink-0">
-          {loading ? '…' : 'Add'}
+          {loading ? '…' : 'Hinzufügen'}
         </Button>
       </form>
 
       {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
 
       {teams.length === 0 ? (
-        <p className="text-sm text-zinc-500">No teams yet.</p>
+        <p className="text-sm text-zinc-500">Noch keine Teams.</p>
       ) : (
         <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
           {teams.map((team) => (
@@ -106,7 +106,8 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
               <div>
                 <p className="text-sm font-medium">{team.name}</p>
                 <p className="text-xs text-zinc-500">
-                  {team.memberCount} members · {team.foundAgents.length} found
+                  {team.memberCount} {team.memberCount === 1 ? 'Mitglied' : 'Mitglieder'} ·{' '}
+                  {team.foundAgents.length} gefunden
                 </p>
               </div>
               <div className="flex items-center gap-1">
@@ -114,7 +115,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setTeamToRecordFind(team)}
-                  aria-label={`Record find for team ${team.name}`}
+                  aria-label={`Fund für Team ${team.name} erfassen`}
                   className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                   <Target className="h-3.5 w-3.5" aria-hidden="true" />
@@ -123,7 +124,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setTeamToEdit(team)}
-                  aria-label={`Edit team ${team.name}`}
+                  aria-label={`Team ${team.name} bearbeiten`}
                   className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                   <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
@@ -132,7 +133,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                   href={`/api/admin/games/${gameId}/teams/${team.id}/setup-qr`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Open setup QR for team ${team.name}`}
+                  aria-label={`Setup-QR für Team ${team.name} öffnen`}
                 >
                   <Button variant="ghost" size="sm">
                     <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
@@ -145,7 +146,7 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                     setDeleteError(null);
                     setTeamToDelete(team);
                   }}
-                  aria-label={`Delete team ${team.name}`}
+                  aria-label={`Team ${team.name} löschen`}
                   className="text-zinc-400 hover:text-red-600"
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
@@ -175,9 +176,9 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
 
       {teamToDelete && (
         <ConfirmDialog
-          title="Delete team"
-          description={`Delete "${teamToDelete.name}"? This team has ${teamToDelete.memberCount} member${teamToDelete.memberCount !== 1 ? 's' : ''} and ${teamToDelete.foundAgents.length} found agent${teamToDelete.foundAgents.length !== 1 ? 's' : ''}. This cannot be undone.`}
-          confirmLabel="Delete"
+          title="Team löschen"
+          description={`„${teamToDelete.name}" löschen? Dieses Team hat ${teamToDelete.memberCount} ${teamToDelete.memberCount !== 1 ? 'Mitglieder' : 'Mitglied'} und ${teamToDelete.foundAgents.length} ${teamToDelete.foundAgents.length !== 1 ? 'gefundene Agenten' : 'gefundenen Agenten'}. Das kann nicht rückgängig gemacht werden.`}
+          confirmLabel="Löschen"
           onConfirm={handleDelete}
           onCancel={() => {
             if (!deleteLoading) {

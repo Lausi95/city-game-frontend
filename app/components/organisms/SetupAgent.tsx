@@ -15,7 +15,7 @@ interface SetupAgentProps {
 
 const TYPE_LABELS: Record<AgentResource['type'], string> = {
   MISTERX: 'Mister X',
-  UTILITY: 'Utility agent',
+  UTILITY: 'Hilfsagent',
 };
 
 /** Shared centered shell, mirroring SetupTeam / ParticipantStub so the surfaces match. */
@@ -109,11 +109,11 @@ export default function SetupAgent({ gameId, agentId }: SetupAgentProps) {
     return (
       <Shell>
         <Heading
-          title="Something went wrong"
-          subtitle="We couldn't set you up as this agent. Check your setup link and try again."
+          title="Etwas ist schiefgelaufen"
+          subtitle="Wir konnten dich nicht als diesen Agenten einrichten. Prüfe deinen Setup-Link und versuche es erneut."
         />
         <Button variant="primary" size="lg" onClick={retry}>
-          Try again
+          Erneut versuchen
         </Button>
       </Shell>
     );
@@ -122,7 +122,7 @@ export default function SetupAgent({ gameId, agentId }: SetupAgentProps) {
   if (phase === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Loading…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
       </Shell>
     );
   }
@@ -131,9 +131,11 @@ export default function SetupAgent({ gameId, agentId }: SetupAgentProps) {
   return (
     <Shell>
       <Heading
-        title={agent?.alias ?? 'Agent setup'}
+        title={agent?.alias ?? 'Agenten-Einrichtung'}
         subtitle={
-          agent ? `${TYPE_LABELS[agent.type]} — confirm this is you.` : 'Confirm this is you.'
+          agent
+            ? `${TYPE_LABELS[agent.type]} — bestätige, dass du das bist.`
+            : 'Bestätige, dass du das bist.'
         }
       />
       <Button
@@ -142,7 +144,7 @@ export default function SetupAgent({ gameId, agentId }: SetupAgentProps) {
         onClick={confirm}
         disabled={confirming}
       >
-        {confirming ? 'Setting up…' : 'This is me'}
+        {confirming ? 'Wird eingerichtet …' : 'Das bin ich'}
       </Button>
     </Shell>
   );

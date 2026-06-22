@@ -55,14 +55,14 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? 'Failed to create agent');
+        throw new Error(err.detail ?? 'Agent konnte nicht erstellt werden');
       }
 
       setForm(defaultForm);
       setShowForm(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-medium">Agents</h2>
+        <h2 className="text-lg font-medium">Agenten</h2>
         <Button
           variant="secondary"
           size="sm"
@@ -83,7 +83,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
             setError(null);
           }}
         >
-          {showForm ? 'Cancel' : 'Add Agent'}
+          {showForm ? 'Abbrechen' : 'Agent hinzufügen'}
         </Button>
       </div>
 
@@ -93,7 +93,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
           className="mb-4 flex flex-col gap-3 rounded-lg border border-zinc-200 p-4"
         >
           <div className="grid grid-cols-2 gap-3">
-            <FormField label="First name" htmlFor="firstName" required>
+            <FormField label="Vorname" htmlFor="firstName" required>
               <Input
                 id="firstName"
                 value={form.firstName}
@@ -101,7 +101,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                 required
               />
             </FormField>
-            <FormField label="Last name" htmlFor="lastName" required>
+            <FormField label="Nachname" htmlFor="lastName" required>
               <Input
                 id="lastName"
                 value={form.lastName}
@@ -117,10 +117,10 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                 value={form.alias}
                 onChange={(e) => set('alias', e.target.value)}
                 required
-                placeholder="In-game alias"
+                placeholder="Alias im Spiel"
               />
             </FormField>
-            <FormField label="Phone number" htmlFor="phoneNumber" required>
+            <FormField label="Telefonnummer" htmlFor="phoneNumber" required>
               <Input
                 id="phoneNumber"
                 type="tel"
@@ -131,17 +131,17 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
             </FormField>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <FormField label="Type" htmlFor="type" required>
+            <FormField label="Typ" htmlFor="type" required>
               <Select
                 id="type"
                 value={form.type}
                 onChange={(e) => set('type', e.target.value as 'MISTERX' | 'UTILITY')}
               >
-                <option value="MISTERX">MISTERX</option>
-                <option value="UTILITY">UTILITY</option>
+                <option value="MISTERX">Mister X</option>
+                <option value="UTILITY">Hilfsagent</option>
               </Select>
             </FormField>
-            <FormField label="Active" htmlFor="active">
+            <FormField label="Aktiv" htmlFor="active">
               <div className="flex items-center gap-2 pt-1">
                 <input
                   id="active"
@@ -151,7 +151,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                   className="h-4 w-4 rounded border-zinc-300"
                 />
                 <label htmlFor="active" className="text-sm text-zinc-600">
-                  Active
+                  Aktiv
                 </label>
               </div>
             </FormField>
@@ -159,14 +159,14 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex justify-end">
             <Button type="submit" disabled={loading} size="sm">
-              {loading ? 'Creating…' : 'Create Agent'}
+              {loading ? 'Wird erstellt …' : 'Agent erstellen'}
             </Button>
           </div>
         </form>
       )}
 
       {agents.length === 0 ? (
-        <p className="text-sm text-zinc-500">No agents yet.</p>
+        <p className="text-sm text-zinc-500">Noch keine Agenten.</p>
       ) : (
         <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
           {agents.map((agent) => (
@@ -174,8 +174,10 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
               <div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium">{agent.alias}</p>
-                  <Badge color={agent.type === 'MISTERX' ? 'red' : 'blue'}>{agent.type}</Badge>
-                  {!agent.active && <Badge color="zinc">Inactive</Badge>}
+                  <Badge color={agent.type === 'MISTERX' ? 'red' : 'blue'}>
+                    {agent.type === 'MISTERX' ? 'Mister X' : 'Hilfsagent'}
+                  </Badge>
+                  {!agent.active && <Badge color="zinc">Inaktiv</Badge>}
                   <LastSeenIndicator location={agent.location} now={now} />
                 </div>
                 <p className="text-xs text-zinc-500">
@@ -187,7 +189,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                   variant="ghost"
                   size="sm"
                   onClick={() => setAgentToEdit(agent)}
-                  aria-label={`Edit agent ${agent.alias}`}
+                  aria-label={`Agent ${agent.alias} bearbeiten`}
                   className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                   <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
@@ -196,7 +198,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                   href={`/api/admin/games/${gameId}/agents/${agent.id}/setup-qr`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Open setup QR for agent ${agent.alias}`}
+                  aria-label={`Setup-QR für Agent ${agent.alias} öffnen`}
                 >
                   <Button variant="ghost" size="sm">
                     <QrCode className="h-3.5 w-3.5" aria-hidden="true" />

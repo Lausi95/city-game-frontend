@@ -48,21 +48,21 @@ export default function EditTeamDialog({ gameId, team, onClose }: EditTeamDialog
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? 'Failed to update team');
+        throw new Error(err.detail ?? 'Team konnte nicht aktualisiert werden');
       }
 
       onClose();
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
       setLoading(false);
     }
   };
 
   return (
-    <Modal title="Edit team" onClose={() => !loading && onClose()}>
+    <Modal title="Team bearbeiten" onClose={() => !loading && onClose()}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <FormField label="Team name" htmlFor="teamName" required>
+        <FormField label="Teamname" htmlFor="teamName" required>
           <Input
             id="teamName"
             value={name}
@@ -82,10 +82,10 @@ export default function EditTeamDialog({ gameId, team, onClose }: EditTeamDialog
             onClick={onClose}
             disabled={loading}
           >
-            Cancel
+            Abbrechen
           </Button>
           <Button type="submit" size="sm" disabled={loading || !trimmed}>
-            {loading ? '…' : 'Save'}
+            {loading ? '…' : 'Speichern'}
           </Button>
         </div>
       </form>

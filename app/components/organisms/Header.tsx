@@ -19,7 +19,7 @@ export default async function Header() {
               href="/admin"
               className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             >
-              Games
+              Spiele
             </Link>
           </nav>
         )}
@@ -33,7 +33,7 @@ export default async function Header() {
             href="/api/auth/federated-logout"
             className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
-            Sign out
+            Abmelden
           </a>
         </div>
       )}

@@ -37,7 +37,7 @@ export default function ParticipantRoot() {
   if (identity === 'loading') {
     return (
       <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        <p className="animate-pulse text-sm text-zinc-400">Loading…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
       </div>
     );
   }
@@ -52,8 +52,8 @@ export default function ParticipantRoot() {
 
   return (
     <ParticipantStub
-      title="No role set"
-      subtitle="Scan your setup QR code to join a game as an agent or a team member."
+      title="Keine Rolle festgelegt"
+      subtitle="Scanne deinen Setup-QR-Code, um als Agent oder Teammitglied an einem Spiel teilzunehmen."
     />
   );
 }

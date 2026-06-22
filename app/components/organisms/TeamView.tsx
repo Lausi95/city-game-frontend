@@ -18,7 +18,7 @@ const BoardMap = dynamic(() => import('@/app/components/organisms/BoardMap'), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-sm text-zinc-400 dark:bg-zinc-900">
-      Loading map…
+      Karte wird geladen …
     </div>
   ),
 });
@@ -37,9 +37,9 @@ function formatSpan(ms: number): string {
 function countdownLabel(board: BoardResource, now: number): string {
   const start = Date.parse(board.game.startTime);
   const end = Date.parse(board.game.endTime);
-  if (now < start) return `Starts in ${formatSpan(start - now)}`;
-  if (now <= end) return `Ends in ${formatSpan(end - now)}`;
-  return 'Ended';
+  if (now < start) return `Beginnt in ${formatSpan(start - now)}`;
+  if (now <= end) return `Endet in ${formatSpan(end - now)}`;
+  return 'Beendet';
 }
 
 export default function TeamView({ gameId, teamId }: TeamViewProps) {
@@ -101,7 +101,7 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
   if (load === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Loading…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
       </Shell>
     );
   }
@@ -114,17 +114,17 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
     <div className="flex h-[100dvh] flex-col bg-black font-sans">
       <header className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-50">
         <h1 className="truncate text-lg font-semibold tracking-tight">
-          {team?.name ?? 'Your team'}
+          {team?.name ?? 'Dein Team'}
         </h1>
         <div className="flex shrink-0 items-center gap-4 text-sm">
           <span className="tabular-nums text-zinc-300">{countdownLabel(board, now)}</span>
           <span className="text-zinc-400">
-            Found <span className="font-semibold text-zinc-100">{team?.foundAgents.length ?? 0}</span>
+            Gefunden <span className="font-semibold text-zinc-100">{team?.foundAgents.length ?? 0}</span>
           </span>
           <Link
             href="/leaderboard"
-            aria-label="Leaderboard"
-            title="Leaderboard"
+            aria-label="Rangliste"
+            title="Rangliste"
             className="text-zinc-400 transition-colors hover:text-zinc-100"
           >
             <Trophy className="h-5 w-5" aria-hidden="true" />
@@ -157,14 +157,14 @@ function RetryError({ onRetry }: { onRetry: () => void }) {
     <Shell>
       <div className="flex flex-col items-center gap-4 px-6 text-center">
         <p className="text-sm text-zinc-400">
-          Couldn&apos;t load the board. Check your connection and try again.
+          Das Spielbrett konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
         </p>
         <button
           type="button"
           onClick={onRetry}
           className="rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-800"
         >
-          Retry
+          Erneut versuchen
         </button>
       </div>
     </Shell>

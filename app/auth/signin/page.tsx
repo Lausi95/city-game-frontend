@@ -19,7 +19,7 @@ export default function SignInPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
       <p className="text-zinc-600 dark:text-zinc-400">
-        Redirecting to login...
+        Weiterleitung zur Anmeldung …
       </p>
       <Suspense>
         <SignInRedirect />

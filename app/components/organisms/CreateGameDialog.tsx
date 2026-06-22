@@ -4,7 +4,7 @@ import { Button } from '@/app/components/atoms/Button';
 export default function CreateGameDialog() {
   return (
     <Link href="/admin">
-      <Button size="lg">Go to Admin Dashboard</Button>
+      <Button size="lg">Zum Admin-Dashboard</Button>
     </Link>
   );
 }

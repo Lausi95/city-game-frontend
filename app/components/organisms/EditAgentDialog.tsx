@@ -89,22 +89,22 @@ export default function EditAgentDialog({
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? 'Failed to update agent');
+        throw new Error(err.detail ?? 'Agent konnte nicht aktualisiert werden');
       }
 
       onClose();
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
       setLoading(false);
     }
   };
 
   return (
-    <Modal title="Edit agent" onClose={() => !loading && onClose()}>
+    <Modal title="Agent bearbeiten" onClose={() => !loading && onClose()}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="First name" htmlFor="firstName" required>
+          <FormField label="Vorname" htmlFor="firstName" required>
             <Input
               id="firstName"
               value={firstName}
@@ -113,7 +113,7 @@ export default function EditAgentDialog({
               autoFocus
             />
           </FormField>
-          <FormField label="Last name" htmlFor="lastName" required>
+          <FormField label="Nachname" htmlFor="lastName" required>
             <Input
               id="lastName"
               value={lastName}
@@ -129,10 +129,10 @@ export default function EditAgentDialog({
               value={alias}
               onChange={(e) => setAlias(e.target.value)}
               required
-              placeholder="In-game alias"
+              placeholder="Alias im Spiel"
             />
           </FormField>
-          <FormField label="Phone number" htmlFor="phoneNumber" required>
+          <FormField label="Telefonnummer" htmlFor="phoneNumber" required>
             <Input
               id="phoneNumber"
               type="tel"
@@ -143,23 +143,23 @@ export default function EditAgentDialog({
           </FormField>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="Type" htmlFor="type" required>
+          <FormField label="Typ" htmlFor="type" required>
             <Select
               id="type"
               value={type}
               onChange={(e) => setType(e.target.value as 'MISTERX' | 'UTILITY')}
               disabled={!canEditType}
             >
-              <option value="MISTERX">MISTERX</option>
-              <option value="UTILITY">UTILITY</option>
+              <option value="MISTERX">Mister X</option>
+              <option value="UTILITY">Hilfsagent</option>
             </Select>
             {!canEditType && (
               <p className="mt-1 text-xs text-zinc-500">
-                Type is locked once the game has started.
+                Der Typ ist gesperrt, sobald das Spiel begonnen hat.
               </p>
             )}
           </FormField>
-          <FormField label="Active" htmlFor="active">
+          <FormField label="Aktiv" htmlFor="active">
             <div className="flex items-center gap-2 pt-1">
               <input
                 id="active"
@@ -169,7 +169,7 @@ export default function EditAgentDialog({
                 className="h-4 w-4 rounded border-zinc-300"
               />
               <label htmlFor="active" className="text-sm text-zinc-600">
-                Active
+                Aktiv
               </label>
             </div>
           </FormField>
@@ -185,10 +185,10 @@ export default function EditAgentDialog({
             onClick={onClose}
             disabled={loading}
           >
-            Cancel
+            Abbrechen
           </Button>
           <Button type="submit" size="sm" disabled={loading || !allRequiredFilled}>
-            {loading ? '…' : 'Save'}
+            {loading ? '…' : 'Speichern'}
           </Button>
         </div>
       </form>

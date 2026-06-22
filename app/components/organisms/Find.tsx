@@ -64,21 +64,21 @@ function Heading({ title, subtitle }: { title: string; subtitle: string }) {
 function errorCopy(status: number): { title: string; subtitle: string } {
   if (status === 404) {
     return {
-      title: "Couldn't record this find",
+      title: 'Fund konnte nicht erfasst werden',
       subtitle:
-        "This link may be out of date, or your team isn't part of this game. Check your setup and try again.",
+        'Dieser Link ist möglicherweise veraltet, oder dein Team gehört nicht zu diesem Spiel. Prüfe deine Einrichtung und versuche es erneut.',
     };
   }
   if (status === 422) {
     return {
-      title: 'Find unavailable',
+      title: 'Fund nicht verfügbar',
       subtitle:
-        "This find isn't available right now — the game may not be running, or this agent can't be found.",
+        'Dieser Fund ist gerade nicht verfügbar — das Spiel läuft möglicherweise nicht, oder dieser Agent kann nicht gefunden werden.',
     };
   }
   return {
-    title: 'Something went wrong',
-    subtitle: "We couldn't record this find. Try again in a moment.",
+    title: 'Etwas ist schiefgelaufen',
+    subtitle: 'Wir konnten diesen Fund nicht erfassen. Versuche es gleich noch einmal.',
   };
 }
 
@@ -163,7 +163,7 @@ export default function Find({ agentId, alias }: FindProps) {
     return () => clearTimeout(t);
   }, [phase, router]);
 
-  const aliasLabel = alias?.trim() || 'this agent';
+  const aliasLabel = alias?.trim() || 'diesen Agenten';
 
   // Identity is read after hydration, so hold a neutral loading state until the
   // client snapshot resolves — mirrors ParticipantRoot, and avoids flashing the
@@ -171,7 +171,7 @@ export default function Find({ agentId, alias }: FindProps) {
   if (stored === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Loading…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
       </Shell>
     );
   }
@@ -182,8 +182,8 @@ export default function Find({ agentId, alias }: FindProps) {
     return (
       <Shell>
         <Heading
-          title="Set up your team first"
-          subtitle="Recording a find needs a team-member device. Scan your team's setup QR, then scan this one again."
+          title="Richte zuerst dein Team ein"
+          subtitle="Zum Erfassen eines Funds brauchst du ein Teammitglieds-Gerät. Scanne den Setup-QR deines Teams und dann diesen hier noch einmal."
         />
       </Shell>
     );
@@ -192,7 +192,7 @@ export default function Find({ agentId, alias }: FindProps) {
   if (phase === 'submitting') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Recording find…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Fund wird erfasst …</p>
       </Shell>
     );
   }
@@ -201,11 +201,11 @@ export default function Find({ agentId, alias }: FindProps) {
     return (
       <Shell>
         <Heading
-          title={alreadyFound ? 'Already found' : `You found ${aliasLabel}!`}
+          title={alreadyFound ? 'Bereits gefunden' : `Du hast ${aliasLabel} gefunden!`}
           subtitle={
             alreadyFound
-              ? `${aliasLabel} is already on your board.`
-              : 'Nice work — taking you back to your board.'
+              ? `${aliasLabel} ist bereits auf deinem Spielbrett.`
+              : 'Gut gemacht — du kommst zurück zu deinem Spielbrett.'
           }
         />
       </Shell>
@@ -218,7 +218,7 @@ export default function Find({ agentId, alias }: FindProps) {
       <Shell>
         <Heading title={title} subtitle={subtitle} />
         <Button variant="primary" size="lg" onClick={() => setPhase('confirm')}>
-          Try again
+          Erneut versuchen
         </Button>
       </Shell>
     );
@@ -227,9 +227,9 @@ export default function Find({ agentId, alias }: FindProps) {
   // confirm — alias only; we deliberately don't reveal the agent's type.
   return (
     <Shell>
-      <Heading title={aliasLabel} subtitle="Confirm your team found this agent." />
+      <Heading title={aliasLabel} subtitle="Bestätige, dass dein Team diesen Agenten gefunden hat." />
       <Button variant="primary" size="lg" onClick={confirm}>
-        Confirm find
+        Fund bestätigen
       </Button>
     </Shell>
   );

@@ -165,9 +165,9 @@ export default function MapSelector({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-xs text-zinc-500">
-        {step === 0 && 'Click the map to set corner A (shown in red)'}
-        {step === 1 && 'Click the map to set corner B (shown in green)'}
-        {step === 2 && 'Click the map to reset and pick new corners'}
+        {step === 0 && 'Tippe auf die Karte, um Ecke A zu setzen (rot dargestellt)'}
+        {step === 1 && 'Tippe auf die Karte, um Ecke B zu setzen (grün dargestellt)'}
+        {step === 2 && 'Tippe auf die Karte, um zurückzusetzen und neue Ecken zu wählen'}
       </p>
       <MapContainer
         center={[51.505, -0.09]}

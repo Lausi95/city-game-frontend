@@ -14,7 +14,7 @@ type Load = 'loading' | 'ready' | 'error';
 
 /** Wall-clock time of a catch, e.g. "14:02". */
 function clockTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 }
 
 /**
@@ -23,11 +23,11 @@ function clockTime(iso: string): string {
  */
 function relativeAge(iso: string, now: number): string {
   const seconds = Math.max(0, Math.floor((now - Date.parse(iso)) / 1000));
-  if (seconds < 60) return 'just now';
+  if (seconds < 60) return 'gerade eben';
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 120) return `${minutes}m ago`;
+  if (minutes < 120) return `vor ${minutes} Min.`;
   const hours = Math.floor(minutes / 60);
-  return `${hours}h ${minutes % 60}m ago`;
+  return `vor ${hours} Std. ${minutes % 60} Min.`;
 }
 
 /**
@@ -120,7 +120,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
     return (
       <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Couldn&apos;t load the leaderboard. Check your connection and try again.
+          Die Rangliste konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
         </p>
         <button
           type="button"
@@ -130,7 +130,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
           }}
           className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
         >
-          Retry
+          Erneut versuchen
         </button>
       </div>
     );
@@ -139,7 +139,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
   if (teams.length === 0) {
     return (
       <p className="px-6 py-16 text-center text-sm text-zinc-500 dark:text-zinc-400">
-        No teams in this game yet.
+        Noch keine Teams in diesem Spiel.
       </p>
     );
   }
@@ -179,7 +179,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
                 {team.teamName}
                 {isYou && (
                   <span className="ml-2 text-xs font-normal text-blue-600 dark:text-blue-400">
-                    you
+                    du
                   </span>
                 )}
               </span>
@@ -187,7 +187,7 @@ export default function Leaderboard({ gameId, highlightTeamId }: LeaderboardProp
                 <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                   {team.foundCount}
                 </span>{' '}
-                found
+                gefunden
               </span>
               <ChevronRight
                 className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform dark:text-zinc-500 ${

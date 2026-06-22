@@ -29,11 +29,11 @@ function bucketFor(ageMs: number): Bucket {
 
 export function formatAge(ageMs: number): string {
   const seconds = Math.max(0, Math.round(ageMs / 1000));
-  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 60) return `vor ${seconds} Sek.`;
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return `vor ${minutes} Min.`;
   const hours = Math.floor(minutes / 60);
-  return `${hours}h ago`;
+  return `vor ${hours} Std.`;
 }
 
 /**
@@ -45,7 +45,7 @@ export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
         <Circle className={`h-2 w-2 fill-current ${dotClass.none}`} aria-hidden="true" />
-        <span>no location</span>
+        <span>kein Standort</span>
       </span>
     );
   }
@@ -68,7 +68,7 @@ export function LastSeenIndicator({ location, now }: LastSeenIndicatorProps) {
   return (
     <span
       className="inline-flex items-center gap-1.5 text-xs text-zinc-500"
-      aria-label={`Last seen ${label}`}
+      aria-label={`Zuletzt gesehen ${label}`}
     >
       <Circle className={`h-2 w-2 fill-current ${dotClass[bucket]}`} aria-hidden="true" />
       <span>{label}</span>

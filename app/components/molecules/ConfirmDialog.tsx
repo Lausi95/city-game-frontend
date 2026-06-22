@@ -16,7 +16,7 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({
   title,
   description,
-  confirmLabel = 'Confirm',
+  confirmLabel = 'Bestätigen',
   onConfirm,
   onCancel,
   loading = false,
@@ -28,7 +28,7 @@ export function ConfirmDialog({
       {error && <p className="mb-4 text-xs text-red-600">{error}</p>}
       <div className="flex justify-end gap-2">
         <Button variant="secondary" size="sm" onClick={onCancel} disabled={loading} autoFocus>
-          Cancel
+          Abbrechen
         </Button>
         <Button variant="danger" size="sm" onClick={onConfirm} disabled={loading}>
           {loading ? '…' : confirmLabel}

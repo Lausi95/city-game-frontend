@@ -32,7 +32,7 @@ export default function LeaderboardPage() {
   if (identity === 'loading') {
     return (
       <div className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        <p className="animate-pulse text-sm text-zinc-400">Loading…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
       </div>
     );
   }
@@ -43,8 +43,8 @@ export default function LeaderboardPage() {
   if (identity?.role !== 'team') {
     return (
       <ParticipantStub
-        title="No team set"
-        subtitle="Scan your team's setup QR code to join a game, then your leaderboard will appear here."
+        title="Kein Team festgelegt"
+        subtitle="Scanne den Setup-QR-Code deines Teams, um an einem Spiel teilzunehmen — danach erscheint hier deine Rangliste."
       />
     );
   }
@@ -56,10 +56,10 @@ export default function LeaderboardPage() {
           href="/"
           className="mb-3 inline-block text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
         >
-          ← Board
+          ← Spielbrett
         </Link>
         <h1 className="mb-4 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Leaderboard
+          Rangliste
         </h1>
         <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
           <Leaderboard gameId={identity.gameId} highlightTeamId={identity.teamId} />

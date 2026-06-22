@@ -53,13 +53,13 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? 'Failed to record find');
+        throw new Error(err.detail ?? 'Fund konnte nicht erfasst werden');
       }
 
       onClose();
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
       setLoading(false);
       setConfirming(false);
     }
@@ -67,10 +67,11 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
 
   if (confirming && selected) {
     return (
-      <Modal title="Record find" onClose={() => !loading && onClose()}>
+      <Modal title="Fund erfassen" onClose={() => !loading && onClose()}>
         <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-          Record that <span className="font-medium">{team.name}</span> found{' '}
-          <span className="font-medium">{selected.alias}</span>? This can&apos;t be undone.
+          Erfassen, dass <span className="font-medium">{team.name}</span>{' '}
+          <span className="font-medium">{selected.alias}</span> gefunden hat? Das kann nicht
+          rückgängig gemacht werden.
         </p>
         {error && <p className="mb-4 text-xs text-red-600">{error}</p>}
         <div className="flex justify-end gap-2">
@@ -81,10 +82,10 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
             onClick={() => setConfirming(false)}
             disabled={loading}
           >
-            Back
+            Zurück
           </Button>
           <Button type="button" size="sm" onClick={handleRecord} disabled={loading}>
-            {loading ? '…' : 'Record find'}
+            {loading ? '…' : 'Fund erfassen'}
           </Button>
         </div>
       </Modal>
@@ -92,15 +93,15 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
   }
 
   return (
-    <Modal title={`Record find — ${team.name}`} onClose={onClose}>
+    <Modal title={`Fund erfassen — ${team.name}`} onClose={onClose}>
       {findable.length === 0 ? (
         <>
           <p className="mb-4 text-sm text-zinc-500">
-            No agents for this team to find right now.
+            Für dieses Team gibt es gerade keine Agenten zum Finden.
           </p>
           <div className="flex justify-end">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>
-              Close
+              Schließen
             </Button>
           </div>
         </>
@@ -112,7 +113,7 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
           }}
           className="flex flex-col gap-4"
         >
-          <FormField label="Agent found" htmlFor="findAgent" required>
+          <FormField label="Gefundener Agent" htmlFor="findAgent" required>
             <Select
               id="findAgent"
               value={agentId}
@@ -121,7 +122,7 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
               autoFocus
             >
               <option value="" disabled>
-                Select an agent…
+                Agent auswählen …
               </option>
               {findable.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -135,10 +136,10 @@ export default function RecordFindDialog({ gameId, team, agents, onClose }: Reco
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>
-              Cancel
+              Abbrechen
             </Button>
             <Button type="submit" size="sm" disabled={!selected}>
-              Record find
+              Fund erfassen
             </Button>
           </div>
         </form>

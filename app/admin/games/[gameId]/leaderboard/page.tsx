@@ -21,7 +21,7 @@ export default async function GameLeaderboardPage({
       >
         ← {game.title}
       </Link>
-      <h1 className="mb-4 text-2xl font-semibold">Leaderboard</h1>
+      <h1 className="mb-4 text-2xl font-semibold">Rangliste</h1>
       <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <Leaderboard gameId={gameId} />
       </div>

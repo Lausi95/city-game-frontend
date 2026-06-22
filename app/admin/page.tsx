@@ -15,15 +15,15 @@ export default async function AdminPage({
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Games</h1>
+        <h1 className="text-2xl font-semibold">Spiele</h1>
         <Link href="/admin/games/new">
-          <Button>New Game</Button>
+          <Button>Neues Spiel</Button>
         </Link>
       </div>
 
       {games.empty ? (
         <div className="rounded-lg border border-dashed border-zinc-300 p-12 text-center text-zinc-500">
-          No games yet. Create your first game.
+          Noch keine Spiele. Erstelle dein erstes Spiel.
         </div>
       ) : (
         <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200">
@@ -36,13 +36,13 @@ export default async function AdminPage({
               <div>
                 <p className="font-medium">{game.title}</p>
                 <p className="text-sm text-zinc-500">
-                  {new Date(game.startTime).toLocaleString()} –{' '}
-                  {new Date(game.endTime).toLocaleString()}
+                  {new Date(game.startTime).toLocaleString('de-DE')} –{' '}
+                  {new Date(game.endTime).toLocaleString('de-DE')}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Badge color="blue">{game.teams} teams</Badge>
-                <Badge color="zinc">{game.agents} agents</Badge>
+                <Badge color="blue">{game.teams} Teams</Badge>
+                <Badge color="zinc">{game.agents} Agenten</Badge>
               </div>
             </Link>
           ))}
@@ -54,17 +54,17 @@ export default async function AdminPage({
           {!games.first && (
             <Link href={`/admin?page=${page - 1}`}>
               <Button variant="secondary" size="sm">
-                Previous
+                Zurück
               </Button>
             </Link>
           )}
           <span className="text-sm text-zinc-500">
-            Page {page + 1} of {games.totalPages}
+            Seite {page + 1} von {games.totalPages}
           </span>
           {!games.last && (
             <Link href={`/admin?page=${page + 1}`}>
               <Button variant="secondary" size="sm">
-                Next
+                Weiter
               </Button>
             </Link>
           )}

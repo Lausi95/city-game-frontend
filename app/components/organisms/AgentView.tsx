@@ -21,7 +21,7 @@ const AgentBoundsMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-sm text-zinc-400 dark:bg-zinc-900">
-        Loading map…
+        Karte wird geladen …
       </div>
     ),
   },
@@ -54,17 +54,17 @@ type Load = 'loading' | 'ready' | 'error';
 
 const TYPE_LABELS: Record<AgentResource['type'], string> = {
   MISTERX: 'Mister X',
-  UTILITY: 'Utility agent',
+  UTILITY: 'Hilfsagent',
 };
 
 // Banner copy per reporting status. 'reporting' shows nothing (all good);
 // 'prompting' is the brief pre-permission window.
 const REPORTING_BANNER: Partial<Record<ReportingStatus, string>> = {
-  prompting: 'Requesting location access… allow it so your position is reported.',
+  prompting: 'Standortzugriff wird angefragt … erlaube ihn, damit deine Position übermittelt wird.',
   denied:
-    "Location access is off — your position isn't being reported. Enable location for this site to rejoin the map.",
+    'Standortzugriff ist aus — deine Position wird nicht übermittelt. Aktiviere den Standort für diese Seite, um wieder auf der Karte zu erscheinen.',
   unavailable:
-    "Can't read your location right now — your position may be going out of date.",
+    'Dein Standort kann gerade nicht gelesen werden — deine Position ist möglicherweise nicht mehr aktuell.',
 };
 
 export default function AgentView({ gameId, agentId }: AgentViewProps) {
@@ -148,7 +148,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
   if (load === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Loading…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
       </Shell>
     );
   }
@@ -157,7 +157,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
     return (
       <Shell>
         <p className="text-sm text-zinc-500">
-          Couldn&apos;t load your agent details. Check your connection and try again.
+          Deine Agentendaten konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.
         </p>
       </Shell>
     );
@@ -178,8 +178,8 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {agent.active
-              ? 'You are in play. Stay on the move.'
-              : "You're currently inactive — the teams aren't hunting you right now."}
+              ? 'Du bist im Spiel. Bleib in Bewegung.'
+              : 'Du bist derzeit inaktiv — die Teams jagen dich gerade nicht.'}
           </p>
         </header>
 
@@ -199,7 +199,7 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
             role="alert"
             className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
           >
-            You&apos;re outside the playfield — head back into the play area.
+            Du bist außerhalb des Spielfelds — geh zurück ins Spielgebiet.
           </p>
         )}
 
@@ -209,27 +209,27 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
             onClick={() => setShowFindQr(true)}
           >
             <QrCode className="h-4 w-4" aria-hidden="true" />
-            Show find QR
+            Fund-QR anzeigen
           </Button>
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <StatTile label="Type">
+          <StatTile label="Typ">
             <Badge color={agent.type === 'MISTERX' ? 'red' : 'blue'}>
               {TYPE_LABELS[agent.type]}
             </Badge>
           </StatTile>
           <StatTile label="Status">
             <Badge color={agent.active ? 'green' : 'zinc'}>
-              {agent.active ? 'Active' : 'Inactive'}
+              {agent.active ? 'Aktiv' : 'Inaktiv'}
             </Badge>
           </StatTile>
           <StatTile label="Name">
             {agent.firstName} {agent.lastName}
           </StatTile>
-          <StatTile label="Phone">{agent.phoneNumber}</StatTile>
+          <StatTile label="Telefon">{agent.phoneNumber}</StatTile>
           <div className="col-span-2">
-            <StatTile label="Last seen">
+            <StatTile label="Zuletzt gesehen">
               <LastSeenIndicator location={agent.location} now={now} />
             </StatTile>
           </div>
@@ -238,13 +238,13 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
           {map && (
             <>
               <div className="col-span-2">
-                <StatTile label="Playfield">
+                <StatTile label="Spielfeld">
                   {bounds === 'in' ? (
-                    <Badge color="green">Within playfield</Badge>
+                    <Badge color="green">Im Spielfeld</Badge>
                   ) : bounds === 'out' ? (
-                    <Badge color="red">Out of bounds</Badge>
+                    <Badge color="red">Außerhalb</Badge>
                   ) : (
-                    <span className="text-zinc-500">Locating…</span>
+                    <span className="text-zinc-500">Wird geortet …</span>
                   )}
                 </StatTile>
               </div>
@@ -259,9 +259,9 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
           )}
           {/* Variable-length list — span the full row, one row per team. */}
           <div className="col-span-2">
-            <StatTile label="Found by">
+            <StatTile label="Gefunden von">
               {agent.foundByTeams.length === 0 ? (
-                <span className="text-zinc-500">Not yet found</span>
+                <span className="text-zinc-500">Noch nicht gefunden</span>
               ) : (
                 <ul className="flex flex-col divide-y divide-zinc-100 dark:divide-zinc-800">
                   {agent.foundByTeams.map((team) => (

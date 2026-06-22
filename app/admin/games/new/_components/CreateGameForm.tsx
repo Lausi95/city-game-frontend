@@ -12,7 +12,7 @@ const MapSelector = dynamic(() => import('@/app/components/organisms/MapSelector
   ssr: false,
   loading: () => (
     <div className="flex h-96 w-full animate-pulse items-center justify-center rounded-md bg-zinc-100 text-sm text-zinc-400">
-      Loading map…
+      Karte wird geladen …
     </div>
   ),
 });
@@ -37,7 +37,7 @@ export default function CreateGameForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cornerA || !cornerB) {
-      setError('Please select both corners on the map');
+      setError('Bitte wähle beide Ecken auf der Karte');
       return;
     }
 
@@ -71,31 +71,31 @@ export default function CreateGameForm() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? 'Failed to create game');
+        throw new Error(err.detail ?? 'Spiel konnte nicht erstellt werden');
       }
 
       const { id } = await res.json();
       router.push(`/admin/games/${id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(err instanceof Error ? err.message : 'Etwas ist schiefgelaufen');
       setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <FormField label="Title" htmlFor="title" required>
+      <FormField label="Titel" htmlFor="title" required>
         <Input
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          placeholder="Game title"
+          placeholder="Spieltitel"
         />
       </FormField>
 
       <div className="grid grid-cols-2 gap-4">
-        <FormField label="Start time" htmlFor="startTime" required>
+        <FormField label="Startzeit" htmlFor="startTime" required>
           <Input
             id="startTime"
             type="datetime-local"
@@ -104,7 +104,7 @@ export default function CreateGameForm() {
             required
           />
         </FormField>
-        <FormField label="End time" htmlFor="endTime" required>
+        <FormField label="Endzeit" htmlFor="endTime" required>
           <Input
             id="endTime"
             type="datetime-local"
@@ -116,9 +116,9 @@ export default function CreateGameForm() {
       </div>
 
       <div>
-        <h3 className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Map Area</h3>
+        <h3 className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Spielfeld</h3>
         <div className="mb-3 grid grid-cols-2 gap-4">
-          <FormField label="Rows" htmlFor="rows">
+          <FormField label="Zeilen" htmlFor="rows">
             <Input
               id="rows"
               type="number"
@@ -128,7 +128,7 @@ export default function CreateGameForm() {
               onChange={(e) => setRows(Number(e.target.value))}
             />
           </FormField>
-          <FormField label="Columns" htmlFor="columns">
+          <FormField label="Spalten" htmlFor="columns">
             <Input
               id="columns"
               type="number"
@@ -156,10 +156,10 @@ export default function CreateGameForm() {
 
       <div className="flex justify-end gap-3">
         <Button type="button" variant="secondary" onClick={() => router.back()}>
-          Cancel
+          Abbrechen
         </Button>
         <Button type="submit" disabled={loading}>
-          {loading ? 'Creating…' : 'Create Game'}
+          {loading ? 'Wird erstellt …' : 'Spiel erstellen'}
         </Button>
       </div>
     </form>

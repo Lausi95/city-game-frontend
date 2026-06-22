@@ -125,11 +125,11 @@ export default function SetupTeam({ gameId, teamId }: SetupTeamProps) {
     return (
       <Shell>
         <Heading
-          title="Something went wrong"
-          subtitle="We couldn't set you up for this team. Check your setup link and try again."
+          title="Etwas ist schiefgelaufen"
+          subtitle="Wir konnten dich nicht für dieses Team einrichten. Prüfe deinen Setup-Link und versuche es erneut."
         />
         <Button variant="primary" size="lg" onClick={retry}>
-          Try again
+          Erneut versuchen
         </Button>
       </Shell>
     );
@@ -138,7 +138,7 @@ export default function SetupTeam({ gameId, teamId }: SetupTeamProps) {
   if (phase === 'loading') {
     return (
       <Shell>
-        <p className="animate-pulse text-sm text-zinc-400">Loading…</p>
+        <p className="animate-pulse text-sm text-zinc-400">Wird geladen …</p>
       </Shell>
     );
   }
@@ -147,11 +147,11 @@ export default function SetupTeam({ gameId, teamId }: SetupTeamProps) {
     return (
       <Shell>
         <Heading
-          title="You're already in this team"
-          subtitle="Your device is set up. Head back to keep hunting."
+          title="Du bist bereits in diesem Team"
+          subtitle="Dein Gerät ist eingerichtet. Geh zurück und jage weiter."
         />
         <Button variant="primary" size="lg" onClick={() => router.replace('/')}>
-          Continue
+          Weiter
         </Button>
       </Shell>
     );
@@ -161,8 +161,8 @@ export default function SetupTeam({ gameId, teamId }: SetupTeamProps) {
   return (
     <Shell>
       <Heading
-        title={team?.name ?? 'Join team'}
-        subtitle="You've been invited to join this team. Tap below to start playing."
+        title={team?.name ?? 'Team beitreten'}
+        subtitle="Du wurdest eingeladen, diesem Team beizutreten. Tippe unten, um loszuspielen."
       />
       <Button
         variant="primary"
@@ -170,7 +170,7 @@ export default function SetupTeam({ gameId, teamId }: SetupTeamProps) {
         onClick={() => void join()}
         disabled={joining}
       >
-        {joining ? 'Joining…' : 'Join team'}
+        {joining ? 'Tritt bei …' : 'Team beitreten'}
       </Button>
     </Shell>
   );

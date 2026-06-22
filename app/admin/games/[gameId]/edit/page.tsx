@@ -18,7 +18,7 @@ export default async function EditGamePage({
       >
         ← {game.title}
       </Link>
-      <h1 className="mb-6 text-2xl font-semibold">Edit Game</h1>
+      <h1 className="mb-6 text-2xl font-semibold">Spiel bearbeiten</h1>
       <EditGameForm
         gameId={gameId}
         initialTitle={game.title}
