@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Pencil, QrCode } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
+import { Tooltip } from '@/app/components/molecules/Tooltip';
 import { Input } from '@/app/components/atoms/Input';
 import { Select } from '@/app/components/atoms/Select';
 import { FormField } from '@/app/components/molecules/FormField';
@@ -215,23 +216,27 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                 </p>
               </div>
               <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setAgentToEdit(agent)}
-                  aria-label={`Agent ${agent.alias} bearbeiten`}
-                  className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-                >
-                  <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setAgentToShowQr(agent)}
-                  aria-label={`Setup-QR für Agent ${agent.alias} öffnen`}
-                >
-                  <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-                </Button>
+                <Tooltip label="Bearbeiten">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAgentToEdit(agent)}
+                    aria-label={`Agent ${agent.alias} bearbeiten`}
+                    className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  >
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
+                <Tooltip label="Setup-QR anzeigen">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAgentToShowQr(agent)}
+                    aria-label={`Setup-QR für Agent ${agent.alias} öffnen`}
+                  >
+                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
               </div>
             </div>
           ))}

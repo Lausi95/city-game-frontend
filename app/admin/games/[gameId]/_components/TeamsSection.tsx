@@ -6,6 +6,7 @@ import { Pencil, QrCode, Target, Trash2 } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { Pagination } from '@/app/components/molecules/Pagination';
+import { Tooltip } from '@/app/components/molecules/Tooltip';
 import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
 import EditTeamDialog from '@/app/components/organisms/EditTeamDialog';
 import RecordFindDialog from '@/app/components/organisms/RecordFindDialog';
@@ -140,44 +141,52 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                 </p>
               </div>
               <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTeamToRecordFind(team)}
-                  aria-label={`Fund für Team ${team.name} erfassen`}
-                  className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-                >
-                  <Target className="h-3.5 w-3.5" aria-hidden="true" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTeamToEdit(team)}
-                  aria-label={`Team ${team.name} bearbeiten`}
-                  className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-                >
-                  <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTeamToShowQr(team)}
-                  aria-label={`Setup-QR für Team ${team.name} öffnen`}
-                >
-                  <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setDeleteError(null);
-                    setTeamToDelete(team);
-                  }}
-                  aria-label={`Team ${team.name} löschen`}
-                  className="text-zinc-400 hover:text-red-600"
-                >
-                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                </Button>
+                <Tooltip label="Fund erfassen">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTeamToRecordFind(team)}
+                    aria-label={`Fund für Team ${team.name} erfassen`}
+                    className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  >
+                    <Target className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
+                <Tooltip label="Bearbeiten">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTeamToEdit(team)}
+                    aria-label={`Team ${team.name} bearbeiten`}
+                    className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  >
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
+                <Tooltip label="Setup-QR anzeigen">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTeamToShowQr(team)}
+                    aria-label={`Setup-QR für Team ${team.name} öffnen`}
+                  >
+                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
+                <Tooltip label="Löschen">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDeleteError(null);
+                      setTeamToDelete(team);
+                    }}
+                    aria-label={`Team ${team.name} löschen`}
+                    className="text-zinc-400 hover:text-red-600"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
               </div>
             </div>
           ))}
