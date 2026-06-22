@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { tenantHeaders } from '@/app/lib/tenant';
+import { logBackendError } from '@/app/lib/logger';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -21,6 +22,7 @@ export async function GET(req: NextRequest) {
   const res = await fetch(`${API_URL}/board`, { headers, cache: 'no-store' });
 
   if (!res.ok) {
+    if (res.status >= 500) logBackendError('participant.board', { status: res.status, path: '/board' });
     const error = await res.json().catch(() => ({ detail: res.statusText }));
     return NextResponse.json(error, { status: res.status });
   }

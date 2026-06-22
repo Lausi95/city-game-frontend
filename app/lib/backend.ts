@@ -6,6 +6,7 @@ import type {
   AgentCollection,
 } from '@/app/types/api';
 import { authedFetch } from './authedFetch';
+import { logBackendError } from './logger';
 
 // All of these read `/games/**`, which requires the operator's access token
 // (see docs/adr/0014-operator-access-token-on-games-endpoints.md). authedFetch
@@ -13,6 +14,9 @@ import { authedFetch } from './authedFetch';
 async function get<T>(path: string): Promise<T> {
   const res = await authedFetch(path, { cache: 'no-store' });
   if (!res.ok) {
+    // The shared admin backend boundary — record the failure before it becomes
+    // a thrown Error a few frames up (see docs/adr/0020).
+    logBackendError('backend.get', { status: res.status, path });
     throw new Error(`Backend ${res.status}: ${path}`);
   }
   return res.json();

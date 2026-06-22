@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { tenantHeaders } from '@/app/lib/tenant';
+import { logBackendError } from '@/app/lib/logger';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (!res.ok) {
+    if (res.status >= 500) logBackendError('participant.team-register', { status: res.status, path: '/team-register' });
     const error = await res.json().catch(() => ({ detail: res.statusText }));
     return NextResponse.json(error, { status: res.status });
   }

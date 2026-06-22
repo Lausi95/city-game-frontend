@@ -24,6 +24,7 @@ AUTH_URL=                # dev only — e.g. http://localhost:3000; unset in pro
 AUTH_SECRET=
 API_URL=                 # backend base URL; defaults to http://localhost:8080
 TENANT_OVERRIDE=         # local dev only: tenant to resolve against (see Tenant resolution)
+LOG_LEVEL=               # optional; defaults to debug in dev / info in prod (see Logging)
 ```
 
 ## Deployment
@@ -100,3 +101,12 @@ The backend exposes an OpenAPI 3 spec at **`http://localhost:8080/v3/api-docs`**
 ### Tenant resolution
 
 The backend resolves the **tenant** (the per-customer verification boundary — see CONTEXT.md → Tenant and ADR 0017) from the request `Origin`. **Every** outbound backend call must attach tenant headers via `tenantHeaders()` from `app/lib/tenant.ts`: `authedFetch` adds them automatically, so anything going through it (and `backend.ts`) is covered; any route that calls the backend with a raw `fetch` must spread `...(await tenantHeaders())` into its headers. The helper derives `Origin` from the incoming host server-side — it never relays the browser's `Origin` — and sends `X-TENANT-OVERRIDE` instead when `TENANT_OVERRIDE` is set for local dev.
+
+## Logging
+
+Use the single `logger` exported from `app/lib/logger.ts` (pino) — never `console.*`. It emits JSON to stdout (the host Datadog Agent tails it in prod); dev pretty-prints via the `npm run dev` pipe through `pino-pretty`. Level is `info` in prod / `debug` in dev, overridable with `LOG_LEVEL`. See [ADR 0020](docs/adr/0020-structured-json-logging-with-pino-for-datadog.md) for the full contract. Conventions:
+
+- **Never log secrets** (tokens, cookies, `Authorization` headers). A `redact` list is the backstop, not a license — don't log header/token objects.
+- **Never log participant PII** — coordinates, `memberId`, `agentId`. Log `gameId`, `tenant`, `route`, `status` instead.
+- **Errors** go through the `err` serializer: `logger.error({ err }, "message")`.
+- **`pino` is in `serverExternalPackages`** (`next.config.ts`) — required, or it crashes on first log under standalone output. Don't add an in-process pino transport (breaks standalone); pretty-printing is a CLI pipe only.

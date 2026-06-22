@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { handlers } from "@/auth";
 import { externalOrigin } from "@/app/lib/origin";
+import { logger } from "@/app/lib/logger";
 
 // NextAuth's route-handler path builds the OAuth origin from `req.url`, which in
 // the standalone container is the listen address `0.0.0.0:3000`, not the tenant
@@ -12,13 +13,17 @@ function withForwardedOrigin(
 ): (req: NextRequest) => Promise<Response> {
   return (req) => {
     // TEMP (ADR 0019): confirm what traefik actually forwards in prod, then
-    // remove. Reachable unauthenticated via /api/auth/providers.
-    console.log("[auth] forwarded headers", {
-      url: req.url,
-      host: req.headers.get("host"),
-      "x-forwarded-host": req.headers.get("x-forwarded-host"),
-      "x-forwarded-proto": req.headers.get("x-forwarded-proto"),
-    });
+    // remove. Reachable unauthenticated via /api/auth/providers. At `debug` it is
+    // off in prod by default — flip LOG_LEVEL=debug to inspect (ADR 0020).
+    logger.debug(
+      {
+        url: req.url,
+        host: req.headers.get("host"),
+        "x-forwarded-host": req.headers.get("x-forwarded-host"),
+        "x-forwarded-proto": req.headers.get("x-forwarded-proto"),
+      },
+      "auth forwarded headers",
+    );
 
     const origin = externalOrigin(req.headers);
     if (origin) {
