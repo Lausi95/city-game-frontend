@@ -248,17 +248,6 @@ export default function AgentsSection({ gameId, canEditType, map }: AgentsSectio
                 </p>
               </div>
               <div className="flex items-center gap-1">
-                <Tooltip label="Bearbeiten">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setAgentToEdit(agent)}
-                    aria-label={`Agent ${agent.alias} bearbeiten`}
-                    className="text-muted hover:text-foreground"
-                  >
-                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Button>
-                </Tooltip>
                 <Tooltip label="Setup-QR anzeigen">
                   <Button
                     variant="ghost"
@@ -278,6 +267,17 @@ export default function AgentsSection({ gameId, canEditType, map }: AgentsSectio
                     className="text-muted hover:text-foreground"
                   >
                     <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
+                <Tooltip label="Bearbeiten">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAgentToEdit(agent)}
+                    aria-label={`Agent ${agent.alias} bearbeiten`}
+                    className="text-muted hover:text-foreground"
+                  >
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                 </Tooltip>
                 <Tooltip label="Löschen">

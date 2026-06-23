@@ -141,6 +141,16 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                 </p>
               </div>
               <div className="flex items-center gap-1">
+                <Tooltip label="Setup-QR anzeigen">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTeamToShowQr(team)}
+                    aria-label={`Setup-QR für Team ${team.name} öffnen`}
+                  >
+                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
                 <Tooltip label="Fund erfassen">
                   <Button
                     variant="ghost"
@@ -161,16 +171,6 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
                     className="text-muted hover:text-foreground"
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Button>
-                </Tooltip>
-                <Tooltip label="Setup-QR anzeigen">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setTeamToShowQr(team)}
-                    aria-label={`Setup-QR für Team ${team.name} öffnen`}
-                  >
-                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                 </Tooltip>
                 <Tooltip label="Löschen">
