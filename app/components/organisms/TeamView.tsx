@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { QrCode, Trophy } from 'lucide-react';
 import type { BoardResource, TeamResource } from '@/app/types/api';
 import ScanQrButton from '@/app/components/molecules/ScanQrButton';
+import { useDeviceLocation } from '@/app/lib/useDeviceLocation';
 
 interface TeamViewProps {
   gameId: string;
@@ -47,6 +48,10 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
   const [load, setLoad] = useState<Load>('loading');
   const [board, setBoard] = useState<BoardResource | null>(null);
   const [team, setTeam] = useState<TeamResource | null>(null);
+
+  // The member's own live position, for a local "you are here" marker. Tracked
+  // in-browser only and never sent to the server — see ADR 0034.
+  const selfLocation = useDeviceLocation();
 
   // Client-only view (rendered post-hydration), so seeding the clock from now
   // is safe — no SSR mismatch. Ticks the countdown between polls.
@@ -148,6 +153,7 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
           map={board.map}
           misterxAgents={board.misterxAgents}
           utilityAgents={board.utilityAgents}
+          selfLocation={selfLocation}
         />
       </div>
     </div>

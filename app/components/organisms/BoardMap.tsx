@@ -18,16 +18,24 @@ import type {
   BoardMisterxAgent,
   BoardUtilityAgent,
   Cell,
+  GeoLocation,
 } from '@/app/types/api';
 
 interface BoardMapProps {
   map: MapDto;
   misterxAgents: BoardMisterxAgent[];
   utilityAgents: BoardUtilityAgent[];
+  /**
+   * The team member's own live position, for a local "you are here" marker.
+   * Never sent to the server — see docs/adr/0034-team-location-client-only.md.
+   * null when there's no fix yet (or geolocation is denied): no marker is drawn.
+   */
+  selfLocation?: GeoLocation | null;
 }
 
 const MISTERX_BRASS = mapColor('--color-misterx');
 const UTILITY_FOG = mapColor('--color-utility');
+const SELF_GREEN = mapColor('--color-success');
 
 /** Geographic extent of the map area, normalised so cornerA/B order doesn't matter. */
 function extentOf(map: MapDto) {
@@ -90,7 +98,7 @@ function cellBounds(map: MapDto, cell: Cell): [[number, number], [number, number
   ];
 }
 
-export default function BoardMap({ map, misterxAgents, utilityAgents }: BoardMapProps) {
+export default function BoardMap({ map, misterxAgents, utilityAgents, selfLocation }: BoardMapProps) {
   const { minLat, maxLat, minLng, maxLng } = extentOf(map);
   const bounds: [[number, number], [number, number]] = [
     [minLat, minLng],
@@ -167,6 +175,15 @@ export default function BoardMap({ map, misterxAgents, utilityAgents }: BoardMap
           </Popup>
         </CircleMarker>
       ))}
+
+      {selfLocation && (
+        <CircleMarker
+          center={[selfLocation.latitude, selfLocation.longitude]}
+          radius={7}
+          interactive={false}
+          pathOptions={{ color: '#ffffff', weight: 2, fillColor: SELF_GREEN, fillOpacity: 1 }}
+        />
+      )}
     </MapContainer>
   );
 }
