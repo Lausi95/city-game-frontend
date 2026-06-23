@@ -98,6 +98,8 @@ Page components (`app/**/page.tsx`) consume organisms and templates — they sho
 
 In admin list rows (e.g. `AgentsSection`, `TeamsSection`), per-item icon action buttons follow a fixed order so they stay consistent across entities: **Setup-QR → misc actions → Edit → Delete**. "Misc" is any entity-specific operational action (e.g. an agent's "Position setzen", a team's "Fund erfassen"). Keep delete last. Add new per-row actions into the "misc" slot.
 
+Each section also renders a collapsible `IconLegend` (`app/components/molecules/IconLegend.tsx`) above its list, explaining what every row icon does and why it exists. When you add or remove a per-row action, update that section's `LEGEND` entries to match.
+
 ## Backend API
 
 The backend exposes an OpenAPI 3 spec at **`http://localhost:8080/v3/api-docs`** (requires the backend running locally). Use this as the authoritative reference for available endpoints, request/response schemas, and error codes when building or modifying frontend API calls.

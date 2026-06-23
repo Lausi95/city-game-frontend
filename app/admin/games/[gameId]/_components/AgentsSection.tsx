@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { MapPin, Pencil, QrCode, Trash2 } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Tooltip } from '@/app/components/molecules/Tooltip';
+import { IconLegend, type IconLegendEntry } from '@/app/components/molecules/IconLegend';
 import { Input } from '@/app/components/atoms/Input';
 import { Select } from '@/app/components/atoms/Select';
 import { FormField } from '@/app/components/molecules/FormField';
@@ -19,6 +20,32 @@ import { useAgents } from './AgentsProvider';
 import type { AgentResource, MapResource } from '@/app/types/api';
 
 const PAGE_SIZE = 10;
+
+const LEGEND: IconLegendEntry[] = [
+  {
+    icon: QrCode,
+    label: 'Setup-QR anzeigen',
+    description:
+      'Öffnet den Setup-QR des Agenten; direkt vom Bildschirm scannen, um ein Gerät zuzuweisen.',
+  },
+  {
+    icon: MapPin,
+    label: 'Position setzen',
+    description:
+      'Setzt den Standort des Agenten manuell. Notlösung, wenn sein Gerät keinen oder einen falschen Standort meldet (z. B. Seite geschlossen).',
+  },
+  {
+    icon: Pencil,
+    label: 'Bearbeiten',
+    description:
+      'Ändert die Agentendaten (Name, Alias, Telefon, Typ, Aktiv-Status). Der Typ ist nur vor Spielstart änderbar.',
+  },
+  {
+    icon: Trash2,
+    label: 'Löschen',
+    description: 'Entfernt den Agenten dauerhaft. Nicht umkehrbar.',
+  },
+];
 
 interface AgentsSectionProps {
   gameId: string;
@@ -140,6 +167,8 @@ export default function AgentsSection({ gameId, canEditType, map }: AgentsSectio
         QR-Code scannen, um ein Gerät diesem Agenten zuzuweisen. Da jeder Agent einzigartig ist und
         sich ohnehin bei der Spielleitung meldet, am besten direkt vom Bildschirm scannen.
       </p>
+
+      <IconLegend entries={LEGEND} />
 
       {showForm && (
         <form

@@ -7,6 +7,7 @@ import { Button } from '@/app/components/atoms/Button';
 import { Input } from '@/app/components/atoms/Input';
 import { Pagination } from '@/app/components/molecules/Pagination';
 import { Tooltip } from '@/app/components/molecules/Tooltip';
+import { IconLegend, type IconLegendEntry } from '@/app/components/molecules/IconLegend';
 import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
 import EditTeamDialog from '@/app/components/organisms/EditTeamDialog';
 import RecordFindDialog from '@/app/components/organisms/RecordFindDialog';
@@ -15,6 +16,31 @@ import type { TeamResource } from '@/app/types/api';
 import { useAgents } from './AgentsProvider';
 
 const PAGE_SIZE = 10;
+
+const LEGEND: IconLegendEntry[] = [
+  {
+    icon: QrCode,
+    label: 'Setup-QR anzeigen',
+    description:
+      'Öffnet den Setup-QR des Teams; am besten ausdrucken, damit Mitglieder ihre Geräte selbst einrichten.',
+  },
+  {
+    icon: Target,
+    label: 'Fund erfassen',
+    description:
+      'Erfasst manuell, dass das Team einen Agenten gefunden hat. Notlösung, wenn das Team den Find-QR nicht selbst scannen kann.',
+  },
+  {
+    icon: Pencil,
+    label: 'Bearbeiten',
+    description: 'Ändert den Teamnamen.',
+  },
+  {
+    icon: Trash2,
+    label: 'Löschen',
+    description: 'Entfernt das Team dauerhaft. Nicht umkehrbar.',
+  },
+];
 
 interface TeamsSectionProps {
   gameId: string;
@@ -103,6 +129,8 @@ export default function TeamsSection({ gameId, teams }: TeamsSectionProps) {
         QR-Code scannen, um ein Gerät diesem Team zuzuweisen. Am besten ausdrucken, damit
         Teammitglieder ihre Geräte selbst einrichten können.
       </p>
+
+      <IconLegend entries={LEGEND} />
 
       <form onSubmit={handleCreate} className="mb-4 flex gap-2">
         <Input
