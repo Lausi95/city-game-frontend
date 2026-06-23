@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { Trophy } from 'lucide-react';
+import { QrCode, Trophy } from 'lucide-react';
 import type { BoardResource, TeamResource } from '@/app/types/api';
+import ScanQrButton from '@/app/components/molecules/ScanQrButton';
 
 interface TeamViewProps {
   gameId: string;
@@ -121,6 +122,17 @@ export default function TeamView({ gameId, teamId }: TeamViewProps) {
           <span className="text-muted">
             Gefunden <span className="font-semibold text-foreground">{team?.foundAgents.length ?? 0}</span>
           </span>
+          <ScanQrButton
+            dialogTitle="QR-Code scannen"
+            hint="Richte die Kamera auf den Finde-QR-Code des Agenten."
+            variant="ghost"
+            size="sm"
+            aria-label="QR scannen"
+            title="QR scannen"
+            className="px-1.5 text-muted hover:text-foreground"
+          >
+            <QrCode className="h-5 w-5" aria-hidden="true" />
+          </ScanQrButton>
           <Link
             href="/leaderboard"
             aria-label="Rangliste"

@@ -12,6 +12,8 @@ interface ParticipantStubProps {
   fields?: IdentityField[];
   /** Placeholder for the action this view will eventually offer. */
   comingSoon?: ReactNode;
+  /** Primary action for this state (e.g. a "scan QR" button). */
+  action?: ReactNode;
 }
 
 /**
@@ -24,6 +26,7 @@ export default function ParticipantStub({
   subtitle,
   fields,
   comingSoon,
+  action,
 }: ParticipantStubProps) {
   return (
     <div className="flex min-h-[calc(100vh-65px)] items-center justify-center">
@@ -50,6 +53,8 @@ export default function ParticipantStub({
             ))}
           </dl>
         )}
+
+        {action}
 
         {comingSoon && (
           <p className="rounded-md border border-dashed border-border-strong px-4 py-3 text-sm text-muted">

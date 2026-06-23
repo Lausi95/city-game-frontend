@@ -1,11 +1,13 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { QrCode } from 'lucide-react';
 import {
   getIdentitySnapshot,
   type ParticipantIdentity,
 } from '@/app/lib/identity';
 import ParticipantStub from '@/app/components/molecules/ParticipantStub';
+import ScanQrButton from '@/app/components/molecules/ScanQrButton';
 import AgentView from '@/app/components/organisms/AgentView';
 import TeamView from '@/app/components/organisms/TeamView';
 
@@ -54,6 +56,16 @@ export default function ParticipantRoot() {
     <ParticipantStub
       title="Keine Rolle festgelegt"
       subtitle="Scanne deinen Setup-QR-Code, um als Agent oder Teammitglied an einem Spiel teilzunehmen."
+      action={
+        <ScanQrButton
+          dialogTitle="QR-Code scannen"
+          hint="Richte die Kamera auf deinen Setup-QR-Code."
+          variant="primary"
+        >
+          <QrCode className="h-4 w-4" aria-hidden="true" />
+          QR scannen
+        </ScanQrButton>
+      }
     />
   );
 }
