@@ -1,14 +1,44 @@
 'use client';
 
-import { MapContainer, TileLayer, CircleMarker, Polyline, Tooltip } from 'react-leaflet';
+import { Fragment } from 'react';
+import L from 'leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  CircleMarker,
+  Polyline,
+  Rectangle,
+  Marker,
+  Popup,
+  Tooltip,
+} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { formatAge } from '@/app/components/molecules/LastSeenIndicator';
 import { mapColor, TILE_URL, TILE_ATTRIBUTION } from '@/app/lib/mapTheme';
-import type { AgentResource, MapResource } from '@/app/types/api';
+import type {
+  AgentResource,
+  MapResource,
+  BoardMisterxAgent,
+  BoardUtilityAgent,
+  Cell,
+} from '@/app/types/api';
+
+/** The board layers a team sees — Mister X obfuscated to cells, utility exact. */
+export interface BoardLayers {
+  misterxAgents: BoardMisterxAgent[];
+  utilityAgents: BoardUtilityAgent[];
+}
 
 interface GameMapProps {
   map: MapResource;
+  /**
+   * Which representation to draw: `admin` plots every located agent at its exact
+   * coordinate; `team` draws the obfuscated team Board. See CONTEXT.md → Spectator view.
+   */
+  mode: 'admin' | 'team';
   agents: AgentResource[];
+  /** Board layers for `team` mode; null while loading or in `admin` mode. */
+  board: BoardLayers | null;
   /** Shared, ticking wall-clock (ms). 0 means "not yet mounted". */
   now: number;
   /** Tailwind sizing override for the map container; defaults to `h-80`. */
@@ -108,7 +138,95 @@ function AgentMarkers({ agents, now }: { agents: AgentResource[]; now: number })
   );
 }
 
-export default function GameMap({ map, agents, now, className = 'h-80' }: GameMapProps) {
+/** South-west / north-east corners of a grid cell. Origin (0,0) is the map's SW corner. */
+function cellBounds(map: MapResource, cell: Cell): [[number, number], [number, number]] {
+  const minLat = Math.min(map.cornerA.latitude, map.cornerB.latitude);
+  const maxLat = Math.max(map.cornerA.latitude, map.cornerB.latitude);
+  const minLng = Math.min(map.cornerA.longitude, map.cornerB.longitude);
+  const maxLng = Math.max(map.cornerA.longitude, map.cornerB.longitude);
+  const cellH = (maxLat - minLat) / map.grid.rows;
+  const cellW = (maxLng - minLng) / map.grid.columns;
+  const south = minLat + cell.row * cellH;
+  const north = minLat + (cell.row + 1) * cellH;
+  const west = minLng + cell.column * cellW;
+  const east = minLng + (cell.column + 1) * cellW;
+  return [
+    [south, west],
+    [north, east],
+  ];
+}
+
+/**
+ * The team Board representation: Mister X obfuscated to grid cells (a shared cell
+ * is drawn once with a count badge), utility agents at their exact location. No
+ * last-seen freshness — the team never sees it (ADR 0008). Mirrors BoardMap, which
+ * serves a team's own device; here it renders the operator's spectator view.
+ */
+function BoardLayersView({ map, board }: { map: MapResource; board: BoardLayers }) {
+  const cells = new Map<string, { cell: Cell; aliases: string[] }>();
+  for (const m of board.misterxAgents) {
+    if (!m.cell) continue; // never-located → can't be placed
+    const key = `${m.cell.row}:${m.cell.column}`;
+    const group = cells.get(key);
+    if (group) group.aliases.push(m.alias);
+    else cells.set(key, { cell: m.cell, aliases: [m.alias] });
+  }
+  const located = board.utilityAgents.filter((u) => u.geoLocation);
+  const brass = mapColor('--color-misterx');
+  const utility = mapColor('--color-utility');
+
+  return (
+    <>
+      {Array.from(cells.entries()).map(([key, { cell, aliases }]) => {
+        const cb = cellBounds(map, cell);
+        const center: [number, number] = [(cb[0][0] + cb[1][0]) / 2, (cb[0][1] + cb[1][1]) / 2];
+        return (
+          <Fragment key={key}>
+            <Rectangle
+              bounds={cb}
+              pathOptions={{ color: brass, weight: 1, fillColor: brass, fillOpacity: 0.4 }}
+            >
+              <Popup>
+                <span className="font-medium">
+                  {aliases.length > 1 ? `${aliases.length} Mister X` : 'Mister X'}
+                </span>
+                <br />
+                {aliases.join(', ')}
+              </Popup>
+            </Rectangle>
+            {aliases.length >= 2 && (
+              <Marker
+                position={center}
+                interactive={false}
+                icon={L.divIcon({
+                  className: '',
+                  iconSize: [40, 40],
+                  iconAnchor: [20, 20],
+                  html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;font:700 22px/1 sans-serif;color:${brass};opacity:0.7;pointer-events:none;">${aliases.length}</div>`,
+                })}
+              />
+            )}
+          </Fragment>
+        );
+      })}
+
+      {located.map((u) => (
+        <CircleMarker
+          key={u.id}
+          center={[u.geoLocation.latitude, u.geoLocation.longitude]}
+          radius={7}
+          pathOptions={{ color: '#ffffff', weight: 2, fillColor: utility, fillOpacity: 1 }}
+        >
+          <Popup>
+            <span className="font-medium">{u.alias}</span>
+          </Popup>
+        </CircleMarker>
+      ))}
+    </>
+  );
+}
+
+export default function GameMap({ map, mode, agents, board, now, className = 'h-80' }: GameMapProps) {
   const minLat = Math.min(map.cornerA.latitude, map.cornerB.latitude);
   const maxLat = Math.max(map.cornerA.latitude, map.cornerB.latitude);
   const minLng = Math.min(map.cornerA.longitude, map.cornerB.longitude);
@@ -138,7 +256,11 @@ export default function GameMap({ map, agents, now, className = 'h-80' }: GameMa
         pathOptions={{ color: mapColor('--color-muted'), fillColor: mapColor('--color-muted'), fillOpacity: 1 }}
       />
       <GridOverlay map={map} />
-      <AgentMarkers agents={agents} now={now} />
+      {mode === 'admin' ? (
+        <AgentMarkers agents={agents} now={now} />
+      ) : (
+        board && <BoardLayersView map={map} board={board} />
+      )}
     </MapContainer>
   );
 }

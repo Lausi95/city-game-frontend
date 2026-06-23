@@ -68,7 +68,12 @@ export default async function GameDetailPage({
                   </span>
                 </div>
                 <div className="min-h-0 flex-1">
-                  <GameMapClient map={map} className="h-full" />
+                  <GameMapClient
+                    gameId={gameId}
+                    map={map}
+                    teams={teams.content}
+                    className="h-full"
+                  />
                 </div>
               </section>
 
