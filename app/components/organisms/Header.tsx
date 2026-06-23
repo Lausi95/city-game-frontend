@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { auth } from '@/auth';
+import { AUTH_BYPASS, resolveOperatorSession } from '@/app/lib/devAuth';
 
 export default async function Header() {
-  const session = await auth();
+  const session = await resolveOperatorSession();
 
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border bg-surface/80 px-6 backdrop-blur-md">
@@ -30,15 +30,24 @@ export default async function Header() {
       </div>
       {session && (
         <div className="flex items-center gap-4">
-          <span className="text-sm text-muted">
-            {session.user?.name ?? session.user?.email}
-          </span>
-          <a
-            href="/api/auth/federated-logout"
-            className="text-sm text-muted transition-colors hover:text-foreground"
-          >
-            Abmelden
-          </a>
+          {AUTH_BYPASS ? (
+            // No Keycloak session locally — show a non-interactive cue, not a
+            // logout that would redirect to Keycloak's logout endpoint for
+            // nothing. See docs/adr/0036-local-dev-bypasses-operator-auth.md.
+            <span className="text-sm text-muted">Local Dev</span>
+          ) : (
+            <>
+              <span className="text-sm text-muted">
+                {session.user?.name ?? session.user?.email}
+              </span>
+              <a
+                href="/api/auth/federated-logout"
+                className="text-sm text-muted transition-colors hover:text-foreground"
+              >
+                Abmelden
+              </a>
+            </>
+          )}
         </div>
       )}
     </header>

@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { getToken } from 'next-auth/jwt';
 import { tenantHeaders } from './tenant';
+import { AUTH_BYPASS } from './devAuth';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -31,20 +32,28 @@ const secureCookie = process.env.NODE_ENV === 'production';
  * (`/find`, `/board`, `/location`, …) — those are tokenless by design.
  */
 export async function authedFetch(path: string, init: RequestInit = {}): Promise<Response> {
-  const cookieHeader = (await cookies()).toString();
-  const token = await getToken({
-    req: { headers: { cookie: cookieHeader } },
-    secret: process.env.AUTH_SECRET!,
-    secureCookie,
-  });
-
-  const accessToken = token?.accessToken;
-  if (!accessToken) {
-    return Response.json({ detail: 'Not authenticated' }, { status: 401 });
-  }
-
   const headers = new Headers(init.headers);
-  headers.set('Authorization', `Bearer ${accessToken}`);
+
+  // Local dev calls the backend tokenless — it requires no operator token there,
+  // and there is no Keycloak session to read. Only the Bearer is dropped; the
+  // tenant headers below still attach. The no-token 401 below is the production
+  // defense-in-depth path and is simply not reached locally.
+  // See docs/adr/0036-local-dev-bypasses-operator-auth.md.
+  if (!AUTH_BYPASS) {
+    const cookieHeader = (await cookies()).toString();
+    const token = await getToken({
+      req: { headers: { cookie: cookieHeader } },
+      secret: process.env.AUTH_SECRET!,
+      secureCookie,
+    });
+
+    const accessToken = token?.accessToken;
+    if (!accessToken) {
+      return Response.json({ detail: 'Not authenticated' }, { status: 401 });
+    }
+
+    headers.set('Authorization', `Bearer ${accessToken}`);
+  }
 
   // Tenant resolution — the backend keys on this; see ./tenant.ts and ADR 0017.
   for (const [key, value] of Object.entries(await tenantHeaders())) {

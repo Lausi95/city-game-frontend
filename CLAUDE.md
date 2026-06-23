@@ -73,7 +73,7 @@ Map components use `react-leaflet` and must be loaded client-side only. Use `nex
 
 All administration operations — game management, team creation, and agent administration — live under `/admin`. This path requires Keycloak **authentication**, and that is the whole of the authorization: any authenticated operator is allowed. There is no further admin role to check (see ADR 0004).
 
-The root page (`/`) and participant API routes, by contrast, are **public** — participants have no Keycloak login (they are identified by IDs carried in `X-GameId`/`X-AgentId`/`X-TeamId`/`X-MemberId` headers from a setup QR scan). The public/protected split is encoded in `proxy.ts`: `/admin` + `/api/admin/*` require authentication, `/` + `/api/participant/*` do not. `proxy.ts` is currently a no-op for local dev, but the matcher reflects the intended policy for when auth is re-enabled.
+The root page (`/`) and participant API routes, by contrast, are **public** — participants have no Keycloak login (they are identified by IDs carried in `X-GameId`/`X-AgentId`/`X-TeamId`/`X-MemberId` headers from a setup QR scan). The public/protected split is encoded in `proxy.ts` (Next.js 16's renamed middleware entrypoint — it is live, not a no-op): `/admin` + `/api/admin/*` require authentication, `/` + `/api/participant/*` do not. In **local dev only** (`NODE_ENV !== 'production'`) operator auth is bypassed end to end — the proxy lets `/admin` through, `authedFetch` drops the Bearer, and the operator session is synthesized for the UI; production is unaffected. See [ADR 0036](docs/adr/0036-local-dev-bypasses-operator-auth.md).
 
 Place admin page components under `app/admin/` and any admin-only API routes under `app/api/admin/`.
 

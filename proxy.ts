@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { AUTH_BYPASS } from "@/app/lib/devAuth";
 
 // Auth enforced for the operator surface. See docs/adr/0014-operator-access-token-on-games-endpoints.md.
 //
@@ -10,6 +11,12 @@ import { auth } from "@/auth";
 //   - /api/admin/*  (fetch)     → 401 JSON, never a redirect (a fetch would follow a
 //                                 302 to the HTML login and corrupt the response).
 export const proxy = auth((req) => {
+  // Local dev disables operator auth end to end — let the operator surface
+  // through with no session. See docs/adr/0036-local-dev-bypasses-operator-auth.md.
+  if (AUTH_BYPASS) {
+    return NextResponse.next();
+  }
+
   // A failed silent refresh leaves a session with a stale token and an `error`
   // flag — treat it as unauthenticated so the operator is forced to re-login
   // rather than slipping through to backend 401s.
