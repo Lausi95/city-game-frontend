@@ -5,7 +5,7 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 
 export interface IconLegendEntry {
   /** The lucide icon rendered in the row — the same glyph used on the action button. */
-  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
   /** The action label, matching the button's tooltip (e.g. "Position setzen"). */
   label: string;
   /** One or two sentences on what the action does and why it exists. */
