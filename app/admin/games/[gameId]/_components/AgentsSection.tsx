@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Pencil, QrCode, Trash2 } from 'lucide-react';
+import { MapPin, Pencil, QrCode, Trash2 } from 'lucide-react';
 import { Button } from '@/app/components/atoms/Button';
 import { Tooltip } from '@/app/components/molecules/Tooltip';
 import { Input } from '@/app/components/atoms/Input';
@@ -13,9 +13,10 @@ import { Badge } from '@/app/components/atoms/Badge';
 import { LastSeenIndicator } from '@/app/components/molecules/LastSeenIndicator';
 import EditAgentDialog from '@/app/components/organisms/EditAgentDialog';
 import SetupQrDialog from '@/app/components/organisms/SetupQrDialog';
+import SetAgentLocationDialog from '@/app/components/organisms/SetAgentLocationDialog';
 import { ConfirmDialog } from '@/app/components/molecules/ConfirmDialog';
 import { useAgents } from './AgentsProvider';
-import type { AgentResource } from '@/app/types/api';
+import type { AgentResource, MapResource } from '@/app/types/api';
 
 const PAGE_SIZE = 10;
 
@@ -23,6 +24,8 @@ interface AgentsSectionProps {
   gameId: string;
   /** Whether agent types may still be changed (only before kickoff). */
   canEditType: boolean;
+  /** Playfield, for the manual "set position" picker. */
+  map: MapResource;
 }
 
 const defaultForm = {
@@ -34,7 +37,7 @@ const defaultForm = {
   active: true,
 };
 
-export default function AgentsSection({ gameId, canEditType }: AgentsSectionProps) {
+export default function AgentsSection({ gameId, canEditType, map }: AgentsSectionProps) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(defaultForm);
@@ -43,6 +46,7 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
 
   const [agentToEdit, setAgentToEdit] = useState<AgentResource | null>(null);
   const [agentToShowQr, setAgentToShowQr] = useState<AgentResource | null>(null);
+  const [agentToLocate, setAgentToLocate] = useState<AgentResource | null>(null);
   const [agentToDelete, setAgentToDelete] = useState<AgentResource | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -265,6 +269,17 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
                     <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                 </Tooltip>
+                <Tooltip label="Position setzen">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAgentToLocate(agent)}
+                    aria-label={`Position von Agent ${agent.alias} setzen`}
+                    className="text-muted hover:text-foreground"
+                  >
+                    <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Button>
+                </Tooltip>
                 <Tooltip label="Löschen">
                   <Button
                     variant="ghost"
@@ -297,6 +312,15 @@ export default function AgentsSection({ gameId, canEditType }: AgentsSectionProp
           src={`/api/admin/games/${gameId}/agents/${agentToShowQr.id}/setup-qr`}
           printName={agentToShowQr.alias}
           onClose={() => setAgentToShowQr(null)}
+        />
+      )}
+
+      {agentToLocate && (
+        <SetAgentLocationDialog
+          gameId={gameId}
+          agent={agentToLocate}
+          map={map}
+          onClose={() => setAgentToLocate(null)}
         />
       )}
 

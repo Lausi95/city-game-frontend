@@ -73,7 +73,7 @@ export default async function GameDetailPage({
               </section>
 
               <div className="min-h-0 overflow-y-auto pr-1">
-                <AgentsSection gameId={gameId} canEditType={canEditType} />
+                <AgentsSection gameId={gameId} canEditType={canEditType} map={map} />
               </div>
             </div>
           }
