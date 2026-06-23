@@ -181,6 +181,12 @@ export default function AgentView({ gameId, agentId }: AgentViewProps) {
               ? 'Du bist im Spiel. Bleib in Bewegung.'
               : 'Du bist derzeit inaktiv — die Teams jagen dich gerade nicht.'}
           </p>
+          {agent.active && (
+            <p className="text-sm text-muted">
+              Lass diese Seite geöffnet und dein Display an, damit dein Standort
+              genau bleibt.
+            </p>
+          )}
         </header>
 
         {banner && (
